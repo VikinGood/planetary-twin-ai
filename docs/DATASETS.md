@@ -14,7 +14,7 @@ uploaded as user EE assets or processed locally with Rasterio/GeoPandas.
 
 | characteristic | dataset_name | provider | earth_engine_id or URL | resolution | units | format | license | global_coverage | account_needed |
 |---|---|---|---|---|---|---|---|---|---|
-| `topography` | Copernicus DEM GLO-30 | ESA / Copernicus | `COPERNICUS/DEM/GLO30` | 30 m (1 arc-sec) | m elevation | GeoTIFF / EE ImageCollection | ESA Open Access (non-commercial) | ✅ Poles included | GEE account |
+| `topography` | Copernicus DEM GLO-30 | ESA / Copernicus | `COPERNICUS/DEM/GLO30_2024_1` (updated — `COPERNICUS/DEM/GLO30` is deprecated) | 30 m (1 arc-sec) | m elevation | GeoTIFF / EE ImageCollection | ESA Open Access (non-commercial) | ✅ Poles included | GEE account |
 | `thermal` | MODIS MOD11A2 — Land Surface Temperature | NASA LPDAAC | `MODIS/061/MOD11A2` | 1 km, 8-day composite | K → °C | EE ImageCollection | NASA Open Data | ⚠️ Polar-night gaps > ~70° | GEE account |
 | `surface_optics` | MODIS MCD43A3 — BRDF/Albedo | NASA LPDAAC | `MODIS/061/MCD43A3` | 500 m, daily | reflectance 0–1 (×0.001 scale) | EE ImageCollection | NASA Open Data | ⚠️ Polar-night gaps | GEE account |
 | `aridity` | TerraClimate | Univ. Idaho / REACCH | `IDAHO_EPSCOR/TERRACLIMATE` | ~4 km (~1/24°), monthly | pr mm/month; pet mm/month×0.1 | EE ImageCollection | CC0 / Public Domain | ✅ Full global land | GEE account |
