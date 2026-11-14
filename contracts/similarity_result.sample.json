@@ -1,0 +1,136 @@
+{
+  "_comment": "MOCK — this is sample data only, not real measurements. Used as interface contract for Phases 3, 4, 5.",
+  "schema_version": "1.0",
+  "cell_id": "-33.125_-69.875",
+  "lat_center": -33.125,
+  "lon_center": -69.875,
+  "body": "moon",
+  "mission_type": "landing",
+  "target": {
+    "id": "malapert_massif",
+    "name": "Malapert Massif",
+    "lat": -85.9,
+    "lon": -3.5,
+    "coordinate_status": "UNVERIFIED"
+  },
+  "selected_characteristics": ["topography", "surface_optics", "thermal", "illumination"],
+  "weights": {
+    "topography": 0.35,
+    "illumination": 0.25,
+    "surface_optics": 0.20,
+    "thermal": 0.20
+  },
+  "characteristic_scores": [
+    {
+      "characteristic_id": "topography",
+      "score": 0.82,
+      "confidence": "high",
+      "proxy": false,
+      "variables": {
+        "slope": {
+          "earth_value": 2.1,
+          "reference_value": 1.8,
+          "units": "degrees",
+          "source": "Copernicus DEM GLO-30, resampled to 1 km"
+        },
+        "roughness": {
+          "earth_value": 18.4,
+          "reference_value": 15.0,
+          "units": "meters",
+          "source": "Copernicus DEM GLO-30 — std-dev in 3×3 km window"
+        }
+      },
+      "hard_cap_applied": false,
+      "hard_cap_slope_deg": 12
+    },
+    {
+      "characteristic_id": "surface_optics",
+      "score": 0.71,
+      "confidence": "medium",
+      "proxy": false,
+      "variables": {
+        "broadband_albedo": {
+          "earth_value": 0.28,
+          "reference_value": 0.12,
+          "units": "0–1",
+          "source": "MODIS MCD43A3 broadband shortwave albedo, annual mean"
+        }
+      }
+    },
+    {
+      "characteristic_id": "thermal",
+      "score": 0.65,
+      "confidence": "medium",
+      "proxy": false,
+      "variables": {
+        "lst_annual_range": {
+          "earth_value": 42.0,
+          "earth_percentile": 0.78,
+          "reference_percentile": 0.82,
+          "units": "°C",
+          "source": "MODIS MOD11A2"
+        },
+        "lst_diurnal_range": {
+          "earth_value": 24.5,
+          "earth_percentile": 0.72,
+          "reference_percentile": 0.80,
+          "units": "°C",
+          "source": "MODIS MOD11A2 — mean of (day LST − night LST)"
+        },
+        "lst_annual_mean": {
+          "earth_value": 14.2,
+          "earth_percentile": 0.55,
+          "reference_percentile": 0.60,
+          "units": "°C",
+          "source": "MODIS MOD11A2"
+        }
+      },
+      "note": "Percentile/regime comparison — absolute temperatures cannot be reproduced on Earth."
+    },
+    {
+      "characteristic_id": "illumination",
+      "score": 0.88,
+      "confidence": "high",
+      "proxy": false,
+      "variables": {
+        "max_solar_elevation": {
+          "earth_value": 10.5,
+          "earth_percentile": 0.08,
+          "reference_percentile": 0.05,
+          "units": "degrees",
+          "source": "Computed from latitude (annual maximum solar elevation)"
+        },
+        "mean_solar_elevation": {
+          "earth_value": 4.2,
+          "earth_percentile": 0.07,
+          "reference_percentile": 0.06,
+          "units": "degrees",
+          "source": "Computed from latitude (annual mean above horizon)"
+        },
+        "sun_fraction": {
+          "earth_value": 0.49,
+          "earth_percentile": 0.42,
+          "reference_percentile": 0.38,
+          "units": "0–1",
+          "source": "Computed from latitude (fraction of year sun > 0°)"
+        }
+      },
+      "note": "LOW SUN regime similarity — target is lunar south pole, not a high-illumination site."
+    }
+  ],
+  "total_score": 0.763,
+  "total_score_formula": "product(score_i ^ w_i) = 0.82^0.35 × 0.71^0.20 × 0.65^0.20 × 0.88^0.25",
+  "environment_tags": ["arid", "polar"],
+  "confidence": "medium",
+  "rank": 14,
+  "is_known_analog": false,
+  "cannot_reproduce": [
+    "Gravity: 1/6 g (1.62 m/s²) — no terrestrial equivalent",
+    "Vacuum: 10⁻¹⁰ Pa atmosphere — no convection, no wind acoustics",
+    "Radiation: unfiltered solar energetic particles and galactic cosmic rays",
+    "Absolute temperatures: 40 K (PSR) to ~400 K (equatorial noon) — Earth cannot match either extreme",
+    "14-day continuous daylight / 14-day darkness cycle",
+    "Regolith: electrostatic, sharp-edged (no weathering) — no terrestrial surface-level equivalent"
+  ],
+  "interpretation": null
+}
