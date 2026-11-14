@@ -4,7 +4,7 @@
   "cell_id": "-62.875_-60.625",
   "lat_center": -62.875,
   "lon_center": -60.625,
-  "cell_description": "MOCK — South Shetland Islands, Antarctic basalt terrain (Deception Island area). Chosen as a plausible Moon-landing analog: polar, low-sun regime, basaltic surface, low albedo.",
+  "cell_description": "MOCK — South Shetland Islands, Antarctic basalt terrain (Deception Island area). Polar, basaltic, low albedo. This cell is a POOR illumination analog for Malapert Massif — intentional: illustrates that no Earth cell can match the lunar south-pole solar regime.",
   "body": "moon",
   "mission_type": "landing",
   "target": {
@@ -79,8 +79,8 @@
     },
     {
       "characteristic_id": "thermal",
-      "score": 0.712,
-      "score_formula": "geometric_mean(range_score=0.820, diurnal_score=0.700, mean_score=0.620) = (0.820*0.700*0.620)^(1/3) = 0.712",
+      "score": 0.906,
+      "score_formula": "geometric_mean(0.920, 0.850, 0.950) = (0.920*0.850*0.950)^(1/3) = 0.906",
       "confidence": "medium",
       "proxy": false,
       "variables": {
@@ -88,8 +88,8 @@
           "earth_value": 38.5,
           "earth_percentile": 0.74,
           "reference_percentile": 0.82,
-          "score": 0.820,
-          "score_formula": "1 - |0.74 - 0.82| = 1 - 0.08 = 0.920 (corrected below)",
+          "score": 0.920,
+          "score_formula": "1 - |0.74 - 0.82| = 1 - 0.08 = 0.920",
           "units": "°C",
           "source": "MODIS MOD11A2"
         },
@@ -112,60 +112,62 @@
           "source": "MODIS MOD11A2"
         }
       },
-      "note": "Percentile/regime comparison — absolute temperatures cannot be reproduced on Earth. Final score = geometric_mean(0.920, 0.850, 0.950) = (0.920*0.850*0.950)^(1/3) = 0.906. See total_score below."
+      "note": "Percentile/regime comparison — absolute temperatures cannot be reproduced on Earth."
     },
     {
       "characteristic_id": "illumination",
-      "score": 0.880,
-      "score_formula": "geometric_mean(max_elev_score=0.870, mean_elev_score=0.890, sun_fraction_score=0.880) = (0.870*0.890*0.880)^(1/3) = 0.880",
+      "score": 0.636,
+      "score_formula": "geometric_mean(0.593, 0.621, 0.700) = (0.593*0.621*0.700)^(1/3) = 0.636",
       "confidence": "high",
       "proxy": false,
+      "note": "INTENTIONALLY LOW — this cell is a poor illumination analog for the lunar south pole. No Earth cell can match the Moon's obliquity-driven low-sun regime (max solar elevation ~1.5–6° all year). Earth minimum is ~23.4° (South Pole at summer solstice). Score discriminates correctly.",
       "variables": {
         "max_solar_elevation": {
-          "earth_value": 4.6,
-          "earth_percentile": 0.06,
-          "reference_percentile": 0.05,
-          "score": 0.990,
-          "score_formula": "1 - |0.06 - 0.05| = 0.990",
+          "earth_value": 50.56,
+          "earth_percentile": 0.407,
+          "reference_percentile": 0.00,
+          "score": 0.593,
+          "score_formula": "1 - |0.407 - 0.00| = 0.593",
+          "earth_value_note": "Computed: 90 - |lat| + 23.44 = 90 - 62.875 + 23.44 = 50.56 deg (summer solstice maximum)",
           "units": "degrees",
-          "source": "Computed from latitude −62.875° (annual maximum solar elevation)"
+          "source": "Computed from latitude −62.875° (annual maximum solar elevation = 90 − |φ| + 23.44°)"
         },
         "mean_solar_elevation": {
-          "earth_value": 1.9,
-          "earth_percentile": 0.07,
-          "reference_percentile": 0.06,
-          "score": 0.990,
-          "score_formula": "1 - |0.07 - 0.06| = 0.990",
+          "earth_value": 19.31,
+          "earth_percentile": 0.429,
+          "reference_percentile": 0.05,
+          "score": 0.621,
+          "score_formula": "1 - |0.429 - 0.05| = 0.621",
+          "earth_value_note": "Computed by integrating solar elevation over 365 days weighted by day fraction above horizon",
           "units": "degrees",
-          "source": "Computed from latitude −62.875° (annual mean above horizon)"
+          "source": "Computed from latitude −62.875° (annual mean solar elevation above horizon)"
         },
         "sun_fraction": {
-          "earth_value": 0.58,
-          "earth_percentile": 0.18,
-          "reference_percentile": 0.42,
-          "score": 0.760,
-          "score_formula": "1 - |0.18 - 0.42| = 1 - 0.24 = 0.760",
+          "earth_value": 0.500,
+          "earth_percentile": 0.50,
+          "reference_percentile": 0.80,
+          "score": 0.700,
+          "score_formula": "1 - |0.50 - 0.80| = 1 - 0.30 = 0.700",
+          "earth_value_note": "Computed: at -62.875°S no polar night (min noon elevation 3.68° > 0); fraction = 0.500 from sunrise/sunset integration",
           "units": "0–1",
-          "source": "Computed from latitude −62.875° (fraction of year sun > 0°)"
+          "source": "Computed from latitude −62.875° (fraction of year sun > 0°; reference target Malapert has LOLA illumination fraction ~0.86)"
         }
-      },
-      "note": "LOW SUN regime similarity. Final = geometric_mean(0.990, 0.990, 0.760) = (0.990*0.990*0.760)^(1/3) = 0.907. See total_score below."
+      }
     }
   ],
-  "_score_note": "Scores above are internally consistent with their own formulas. The per-variable thermal and illumination scores are recomputed here for the total; thermal final=0.906, illumination final=0.907 (not 0.712/0.880 as in the objects above — those summary fields are illustrative; the formula fields are authoritative). total_score uses the authoritative per-characteristic scores.",
   "characteristic_summary_scores": {
     "topography": 0.779,
     "surface_optics": 0.923,
     "thermal": 0.906,
-    "illumination": 0.907
+    "illumination": 0.636
   },
-  "total_score": 0.861,
-  "total_score_formula": "0.779^0.35 * 0.923^0.20 * 0.906^0.20 * 0.907^0.25 = 0.918 * 0.983 * 0.982 * 0.977 = 0.861",
+  "total_score": 0.790,
+  "total_score_formula": "0.779^0.35 * 0.923^0.20 * 0.906^0.20 * 0.636^0.25 = 0.9163 * 0.9841 * 0.9804 * 0.8931 = 0.7895 ≈ 0.790",
   "total_score_detail": {
-    "topography": "0.779^0.35 = 0.918",
-    "surface_optics": "0.923^0.20 = 0.983",
-    "thermal": "0.906^0.20 = 0.982",
-    "illumination": "0.907^0.25 = 0.977"
+    "topography": "0.779^0.35 = 0.9163",
+    "surface_optics": "0.923^0.20 = 0.9841",
+    "thermal": "0.906^0.20 = 0.9804",
+    "illumination": "0.636^0.25 = 0.8931"
   },
   "environment_tags": ["polar", "volcanic", "arid"],
   "environment_tag_rules": {
@@ -176,9 +178,10 @@
     "cave": "volcanic_caves HIGH likelihood not confirmed → FALSE"
   },
   "confidence": "medium",
-  "rank": 8,
+  "rank": 182,
   "is_known_analog": false,
   "cannot_reproduce": [
+    "Solar elevation regime: lunar obliquity ~1.5° means the sun never rises above ~6° at the south pole all year. Earth's annual maximum solar elevation cannot drop below ~23.4° (South Pole at summer solstice). No Earth cell can replicate the near-horizon sun regime of the lunar south pole.",
     "Gravity: 1/6 g (1.62 m/s²) — no terrestrial equivalent",
     "Vacuum: ~10⁻¹⁰ Pa — no convection, no wind acoustics",
     "Radiation: unfiltered solar energetic particles and galactic cosmic rays",

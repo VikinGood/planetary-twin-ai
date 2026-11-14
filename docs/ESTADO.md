@@ -8,7 +8,7 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | --- | --- | --- | --- | --- | --- |
 | 0 Setup | 00-kickoff-orchestrator.md | Space Apps Orchestrator | approved | Guillermo | |
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
-| 2 Data and architecture | 02-data-architecture.md | Plan | review (fixes applied) | | |
+| 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
 | 3 Backend core | 03-backend.md | Agent | pending | | parallel with 4 and 5 |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
 | 5 Explorer dashboard | 05-frontend.md | Agent | pending | | parallel with 3 and 4 |

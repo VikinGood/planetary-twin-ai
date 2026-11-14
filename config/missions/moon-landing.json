@@ -6,41 +6,41 @@
       "name": "Peak near Cabeus B",
       "lat": -84.9,
       "lon": -47.0,
-      "description": "High peak adjacent to Cabeus B crater, south polar region. NASA release 24-136 candidate.",
+      "description": "High peak adjacent to Cabeus B crater, south polar region. NASA release 24-136 candidate. 'Peak near Cabeus B' is an informal name; not in USGS Gazetteer.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "Approximate — no named feature in USGS Gazetteer; derived from NASA release 24-136 map image"
+      "coordinate_source": "Approximate — informal name from NASA release 24-136 map; no USGS Gazetteer entry for this peak"
     },
     {
       "name": "Haworth",
       "lat": -87.5,
-      "lon": -5.0,
+      "lon": -4.5,
       "description": "Haworth crater area, south polar region. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Haworth crater center, approximate"
+      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Haworth crater center approximate; crater rim coordinates differ from center"
     },
     {
       "name": "Malapert Massif",
       "lat": -85.9,
-      "lon": -3.5,
-      "description": "High massif near south pole; near-continuous illumination candidate. NASA release 24-136 candidate.",
+      "lon": -2.0,
+      "description": "Malapert Massif (informal; near Malapert crater), south polar region. Near-continuous illumination candidate. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Malapert feature, approximate"
+      "coordinate_source": "USGS Gazetteer — Malapert crater center ~-84.9°, -2.9°; Massif refers to a ridge N of the crater, approximate offset applied"
     },
     {
       "name": "Mons Mouton Plateau",
       "lat": -84.1,
-      "lon": -20.0,
-      "description": "Plateau region of Mons Mouton, broader area. NASA release 24-136 candidate.",
+      "lon": -15.6,
+      "description": "Plateau region of Mons Mouton. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Mons Mouton, approximate; plateau region"
+      "coordinate_source": "USGS Gazetteer — Mons Mouton center approximately -84.1°, -15.6° (previous lon -20.0 was incorrect)"
     },
     {
       "name": "Mons Mouton",
-      "lat": -83.9,
-      "lon": -22.5,
+      "lat": -84.1,
+      "lon": -15.6,
       "description": "Summit of Mons Mouton, south polar mountain. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Mons Mouton center, approximate"
+      "coordinate_source": "USGS Gazetteer — Mons Mouton center approximately -84.1°, -15.6° (previous lon -22.5 was incorrect; Mons Mouton and its plateau are very close in lat/lon)"
     },
     {
       "name": "Nobile Rim 1",
@@ -48,7 +48,7 @@
       "lon": 53.5,
       "description": "First candidate region on Nobile crater rim. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Nobile crater, rim approximate"
+      "coordinate_source": "USGS Gazetteer — Nobile crater center ~-85.2°, 53.5°; rim candidate is offset from center"
     },
     {
       "name": "Nobile Rim 2",
@@ -56,26 +56,27 @@
       "lon": 57.0,
       "description": "Second candidate region on Nobile crater rim. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — Nobile crater, rim approximate"
+      "coordinate_source": "Approximate — second rim position derived from NASA release 24-136 map; not separately named in USGS Gazetteer"
     },
     {
       "name": "de Gerlache Rim 2",
       "lat": -88.5,
-      "lon": -91.0,
+      "lon": -88.0,
       "description": "Second candidate region on de Gerlache crater rim. NASA release 24-136 candidate.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "USGS Gazetteer of Planetary Nomenclature — de Gerlache crater, rim approximate"
+      "coordinate_source": "USGS Gazetteer — de Gerlache crater center ~-88.5°, -88.0° (previous lon -91.0 was approximate; updated to Gazetteer value)"
     },
     {
       "name": "Slater Plain",
       "lat": -88.3,
       "lon": 140.0,
-      "description": "Relatively flat plain near south pole. NASA release 24-136 candidate.",
+      "description": "Relatively flat plain near south pole. NASA release 24-136 candidate. 'Slater Plain' is an informal name; not in USGS Gazetteer.",
       "coordinate_status": "UNVERIFIED",
-      "coordinate_source": "Approximate — Slater Plain is a local informal name in south polar region; derived from NASA release 24-136 map image"
+      "coordinate_source": "Approximate — informal name from NASA release 24-136 map; no USGS Gazetteer entry"
     }
   ],
   "source": "NASA press release 24-136, October 28 2024 — https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-lunar-landing/",
+  "coordinate_note": "All coordinates UNVERIFIED. Named features (Haworth, Malapert, Mons Mouton, Nobile, de Gerlache) cross-referenced with USGS Gazetteer of Planetary Nomenclature; informal names (Peak near Cabeus B, Mons Mouton Plateau, Nobile Rim 2, Slater Plain) derived from release map only. Ramiro (GIS) must verify all nine against NASA's official region-boundary maps before Phase 6.",
   "default_characteristics": ["topography", "surface_optics", "thermal", "illumination"],
   "default_weights": {
     "topography": 0.35,
@@ -84,6 +85,6 @@
     "thermal": 0.20
   },
   "topography_hard_cap_slope_deg": 12,
-  "topography_hard_cap_label": "TEAM ASSUMPTION — no verifiable mission-specific source confirmed; Apollo operations used ≤12° as a practical threshold",
+  "topography_hard_cap_label": "TEAM ASSUMPTION — Apollo practical threshold; no verifiable HLS spec confirmed",
   "topography_neighborhood_radius_km": 12
 }

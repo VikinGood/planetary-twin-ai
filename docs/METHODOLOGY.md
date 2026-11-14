@@ -167,18 +167,49 @@ when the target has a very uniform surface. Adjust σ_target per body from actua
 
 ### 2.8 illumination
 
-**Comparison rule:** Percentile / regime — similarity to the target's solar-elevation regime.  
+**Comparison rule:** Percentile / regime — similarity to the target's solar-elevation regime.
 The analog value of the lunar south pole is a **LOW SUN** regime: low solar elevation,
 long shadows, extended day/night cycles. This is not "maximize illumination".
 
-**Earth variables:** from latitude and terrain (computed offline):
-  - Annual maximum solar elevation (°).
-  - Annual mean solar elevation above horizon (°).
-  - Annual fraction of time with sun above horizon (0–1).
+**Earth solar geometry — formulas (computed analytically from latitude φ, no external dataset):**
+
+For each Earth cell centroid latitude φ and each day d of the year (d = 0…364):
+```
+declination(d)  = 23.44° × sin(360/365 × (d − 81))      [degrees]
+max_solar_elevation = 90° − |φ| + 23.44°                  (capped at 90°; summer solstice)
+cos_h0(d)       = −tan(φ) × tan(declination(d))
+  if cos_h0 ≥ 1 → polar night (day_fraction = 0)
+  if cos_h0 ≤ −1 → midnight sun (day_fraction = 1)
+  else → day_fraction = arccos(cos_h0) / π
+sun_fraction    = mean(day_fraction) over 365 days
+mean_solar_elevation = time-weighted mean of arcsin(sin(decl)·sin(φ) + cos(decl)·cos(φ)·sin(h0)/h0)
+                       over all days above horizon
+```
+
+**Key constraint (what Earth cannot reproduce):**
+The Moon's obliquity is ~1.54°, so solar elevation at the lunar south pole (−89.9°) stays
+between −1.54° and +1.54° all year — the sun never rises more than ~6° above the horizon even
+at the most illuminated ridge. On Earth, the annual maximum solar elevation is `90° − |φ| + 23.44°`,
+which reaches a **minimum of 23.44°** at the geographic South Pole. No Earth surface location can
+replicate the Moon's near-horizontal sun regime. The percentile/regime comparison captures
+relative similarity but this fundamental gap must always be reported in `cannot_reproduce`.
+
+**Unit test anchors** (preprocessing must pass these before scoring runs):
+| latitude | max_solar_elev | sun_fraction |
+|---|---|---|
+| 0° (equator) | 90.00° | 0.500 |
+| −62.875° | 50.56° | 0.500 |
+| −90° (South Pole) | 23.44° | ~0.500 (circumpolar half-year) |
+
+**Earth variables** (all computed from latitude):
+  - Annual maximum solar elevation (°): `90° − |φ| + 23.44°`, capped at 90°.
+  - Annual mean solar elevation above horizon (°): integrated over 365 days.
+  - Annual fraction of time with sun above horizon (0–1): mean day_fraction over 365 days.
 
 **Moon variables:** LOLA polar illumination products:
-  - Average illumination fraction at the target.
+  - Average illumination fraction at the target (0–1).
   - Solar elevation range at the target latitude (derived from orbital geometry).
+  - Reference percentile: mapped from LOLA illumination fraction onto the Earth distribution.
 
 **Mars variables:** Illumination is latitude-driven; computed from orbital parameters.
 Mars illumination gets **low default weight** (see mission presets); seasonal dust
