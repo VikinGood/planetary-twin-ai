@@ -58,13 +58,17 @@ Characteristic catalog (ids are fixed; Phase 1 defines variables and rules for e
 Plus `logistics` (travel time, protected areas): a filter and cost, never a similarity.
 
 Mission type presets (defaults, editable in the UI):
-- **Landing site:** topography, surface_optics, thermal, illumination selected; slope and
+- **Moon landing site:** topography, surface_optics, thermal, illumination selected; slope and
   roughness weigh most. Activities to test: descent imaging, hazard detection, landing pad,
   first mobility.
-- **Permanent base:** ice_polar, volcanic_caves, thermal, illumination, geology, topography
-  selected; resources (ice) and shelter (caves) weigh most. Activities to test: habitat
-  construction, ISRU water extraction, shelter, power in extreme light regimes,
-  long-duration crew operations.
+- **Mars landing site:** topography, surface_optics, aridity, thermal selected; slope weighs
+  most; illumination excluded (Mars sol-length day makes it a minor constraint; aridity is
+  more discriminating — decision 2026-11-14). Activities to test: descent imaging, hazard
+  detection, landing pad, first mobility.
+- **Permanent base (both bodies):** ice_polar, volcanic_caves, thermal, illumination, geology,
+  topography selected; resources (ice) and shelter (caves) weigh most. Mars base also includes
+  aridity. Activities to test: habitat construction, ISRU water extraction, shelter, power in
+  extreme light regimes, long-duration crew operations.
 
 Reference targets (defaults, confirm in Phase 1):
 - Moon, landing: NASA's nine candidate south-polar landing regions (announced Oct 28, 2024),

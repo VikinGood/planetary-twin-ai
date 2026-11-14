@@ -1,0 +1,186 @@
+[
+  {
+    "id": "topography",
+    "name": "Topography",
+    "description": "Slope, roughness, and local relief — primary safety and construction constraint.",
+    "comparison_rule": "absolute",
+    "landing_hard_cap_slope_deg": 12,
+    "landing_hard_cap_source": "NASA Human Landing System terrain hazard threshold (Apollo operations ≤12°)",
+    "base_neighborhood_radius_km": 12,
+    "earth_variables": [
+      { "name": "slope", "source": "Copernicus DEM GLO-30, resampled to 1 km", "units": "degrees" },
+      { "name": "roughness", "source": "Copernicus DEM GLO-30 — std-dev of elevation in 3×3 km window", "units": "meters" },
+      { "name": "local_relief", "source": "Copernicus DEM GLO-30 — elevation range in 12 km neighborhood", "units": "meters" }
+    ],
+    "moon_variables": [
+      { "name": "slope", "source": "LOLA slope products (polar and global)", "units": "degrees" },
+      { "name": "roughness", "source": "LOLA DEM — std-dev of elevation in equivalent window", "units": "meters" },
+      { "name": "local_relief", "source": "LOLA DEM — elevation range in 12 km neighborhood", "units": "meters" }
+    ],
+    "mars_variables": [
+      { "name": "slope", "source": "MOLA/MOLA-HRSC blended DEM (200 m)", "units": "degrees" },
+      { "name": "roughness", "source": "MOLA/MOLA-HRSC — std-dev of elevation", "units": "meters" },
+      { "name": "local_relief", "source": "MOLA/MOLA-HRSC — elevation range in 12 km neighborhood", "units": "meters" }
+    ],
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "geology",
+    "name": "Geology",
+    "description": "Lithology and regolith analog — indicates construction material and surface chemistry.",
+    "comparison_rule": "categorical",
+    "class_mapping_note": "GLiM class → Moon/Mars geologic class; mapping table maintained in preprocessing scripts.",
+    "earth_variables": [
+      { "name": "lithology_class", "source": "GLiM global lithological map (PANGAEA)", "units": "categorical" }
+    ],
+    "moon_variables": [
+      { "name": "geologic_unit", "source": "Unified Geologic Map of the Moon, USGS 1:5M", "units": "categorical" }
+    ],
+    "mars_variables": [
+      { "name": "geologic_unit", "source": "USGS Global Geologic Map of Mars, Tanaka et al. 2014", "units": "categorical" }
+    ],
+    "score_range": [0, 1],
+    "score_values": { "primary_match": 1.0, "secondary_match": 0.5, "no_match": 0.0 },
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "thermal",
+    "name": "Thermal",
+    "description": "Temperature extremes and daily range — hardware stress and thermal management.",
+    "comparison_rule": "percentile_regime",
+    "comparison_rule_note": "Absolute temperatures cannot be reproduced on Earth. Scoring uses percentile rank of annual mean, range, and diurnal range across all Earth cells.",
+    "earth_variables": [
+      { "name": "lst_annual_mean", "source": "MODIS MOD11A2 (1 km, 8-day composite)", "units": "°C" },
+      { "name": "lst_annual_range", "source": "MODIS MOD11A2 — max minus min monthly mean", "units": "°C" },
+      { "name": "lst_diurnal_range", "source": "MODIS MOD11A2 — mean of (day LST − night LST)", "units": "°C" }
+    ],
+    "moon_variables": [
+      { "name": "temp_annual_mean", "source": "Diviner Lunar Radiometer — annual mean", "units": "K" },
+      { "name": "temp_annual_range", "source": "Diviner — max minus min", "units": "K" },
+      { "name": "temp_diurnal_range", "source": "Diviner — mean diurnal amplitude", "units": "K" }
+    ],
+    "mars_variables": [
+      { "name": "temp_annual_mean", "source": "TES thermal data / Mars Climate Database", "units": "K" },
+      { "name": "temp_annual_range", "source": "TES / MCD — max minus min", "units": "K" },
+      { "name": "temp_diurnal_range", "source": "TES / MCD — mean diurnal amplitude", "units": "K" }
+    ],
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "aridity",
+    "name": "Aridity",
+    "description": "Aridity and liquid-water absence — REQUIREMENT: score rewards proximity to maximum aridity.",
+    "comparison_rule": "requirement",
+    "comparison_rule_note": "REQUIREMENT. Moon and Mars are maximally arid. Score = 1 − min(pr/pet, 1). Cells with permanent ice cover score 0.",
+    "earth_variables": [
+      { "name": "precipitation", "source": "TerraClimate (IDAHO_EPSCOR/TERRACLIMATE), annual sum", "units": "mm/yr" },
+      { "name": "pet", "source": "TerraClimate, annual potential evapotranspiration", "units": "mm/yr" },
+      { "name": "aridity_index", "source": "Computed: pr / pet", "units": "dimensionless" }
+    ],
+    "moon_variables": null,
+    "moon_not_applicable_reason": "Moon is maximally arid by definition; requirement score always = 1 for Moon targets.",
+    "mars_variables": null,
+    "mars_not_applicable_reason": "Mars is maximally arid by definition; requirement score always = 1 for Mars targets.",
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "ice_polar",
+    "name": "Ice and Polar",
+    "description": "Ground ice, permafrost, and polar light regime — in-situ water resource and polar environment.",
+    "comparison_rule": "categorical_and_absolute",
+    "earth_variables": [
+      { "name": "permafrost_index", "source": "IPA Global Permafrost Zonation Index (GZI)", "units": "0–1" },
+      { "name": "ice_cover_fraction", "source": "MODIS MCD12Q1 ice/snow land-cover fraction", "units": "0–1" },
+      { "name": "latitude", "source": "Cell centroid", "units": "degrees" }
+    ],
+    "latitude_multipliers": {
+      "abs_lat_gt_55": 1.0,
+      "abs_lat_23p5_to_55": 0.5,
+      "abs_lat_lt_23p5": 0.0
+    },
+    "moon_variables": [
+      { "name": "illumination_fraction", "source": "LOLA polar illumination products — average illumination fraction", "units": "0–1" },
+      { "name": "psr_coverage", "source": "LROC permanently shadowed region atlas", "units": "fraction" },
+      { "name": "ice_detection", "source": "Lunar ice detection maps (combined LCROSS, LEND, Mini-RF)", "units": "binary/confidence" }
+    ],
+    "mars_variables": [
+      { "name": "ice_depth", "source": "SWIM (Subsurface Water Ice Mapping) dataset", "units": "cm depth to ice" },
+      { "name": "ice_confidence", "source": "SWIM — confidence class", "units": "categorical" }
+    ],
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "volcanic_caves",
+    "name": "Volcanic Terrain and Caves",
+    "description": "Volcanic terrain and lava-tube proxy — natural shelter from radiation and thermal extremes.",
+    "comparison_rule": "categorical",
+    "proxy_confidence": "LOW",
+    "proxy_label": "PROXY",
+    "proxy_note": "No global open catalog of Earth lava tubes exists. Likelihood is estimated from GLiM vb class and distance to qualifying Holocene volcanoes. Validate against NASA Planetary Pits and Caves Analog Dataset.",
+    "proxy_likelihood_rules": {
+      "HIGH": "GLiM vb class present AND distance ≤ 50 km to qualifying Holocene volcano",
+      "MEDIUM": "GLiM vb class present OR distance ≤ 100 km to qualifying Holocene volcano",
+      "LOW": "neither condition met"
+    },
+    "proxy_scores": { "HIGH": 1.0, "MEDIUM": 0.5, "LOW": 0.0 },
+    "qualifying_volcano_types": ["Shield volcano", "Lava dome(s)", "Fissure vent(s)", "Volcanic field"],
+    "earth_variables": [
+      { "name": "lithology_class_vb", "source": "GLiM — basic volcanic class (vb)", "units": "categorical" },
+      { "name": "distance_to_holocene_volcano", "source": "Smithsonian GVP Holocene volcanoes, filtered by type", "units": "km" }
+    ],
+    "moon_variables": [
+      { "name": "pit_location", "source": "LROC lunar pit atlas (data.lroc.im-ldi.com)", "units": "point geometry" }
+    ],
+    "mars_variables": [
+      { "name": "cave_candidate", "source": "Mars Global Cave Candidate Catalog (MGC³)", "units": "point geometry" }
+    ],
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "surface_optics",
+    "name": "Surface Optics",
+    "description": "Albedo and dust — affects imaging, thermal balance, and surface operations.",
+    "comparison_rule": "absolute",
+    "scoring_sigma": 0.05,
+    "scoring_note": "Gaussian similarity: score = exp(−(albedo_earth − albedo_target)² / (2 × 0.05²)).",
+    "earth_variables": [
+      { "name": "broadband_albedo", "source": "MODIS MCD43A3 broadband shortwave albedo, annual mean", "units": "0–1" }
+    ],
+    "moon_variables": [
+      { "name": "reflectance", "source": "LROC WAC reflectance (normalized broadband)", "units": "0–1" }
+    ],
+    "mars_variables": [
+      { "name": "albedo", "source": "TES bolometric albedo", "units": "0–1" },
+      { "name": "dust_cover_index", "source": "TES dust cover index", "units": "0–1" }
+    ],
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  },
+  {
+    "id": "illumination",
+    "name": "Illumination",
+    "description": "Solar elevation regime — LOW SUN analog for lunar south pole; latitude-driven for Mars.",
+    "comparison_rule": "percentile_regime",
+    "comparison_rule_note": "Scores similarity to the target's solar-elevation regime. The lunar south-pole analog is a LOW SUN regime, not 'maximize illumination'.",
+    "earth_variables": [
+      { "name": "max_solar_elevation", "source": "Computed from latitude (annual maximum solar elevation angle)", "units": "degrees" },
+      { "name": "mean_solar_elevation", "source": "Computed from latitude (annual mean above horizon)", "units": "degrees" },
+      { "name": "sun_fraction", "source": "Computed from latitude (fraction of year with sun above horizon)", "units": "0–1" }
+    ],
+    "moon_variables": [
+      { "name": "illumination_fraction", "source": "LOLA polar illumination products — average illumination fraction", "units": "0–1" },
+      { "name": "solar_elevation_range", "source": "Derived from orbital geometry at target latitude", "units": "degrees" }
+    ],
+    "mars_variables": [
+      { "name": "illumination_fraction", "source": "Computed from Mars orbital parameters and target latitude", "units": "0–1" }
+    ],
+    "mars_weight_note": "Illumination gets low default weight for Mars (excluded from mars-landing preset); seasonal dust variation is captured by surface_optics.",
+    "score_range": [0, 1],
+    "supported_bodies": ["moon", "mars"]
+  }
+]

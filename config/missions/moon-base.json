@@ -1,0 +1,19 @@
+{
+  "body": "moon",
+  "mission_type": "base",
+  "reference_targets": [
+    { "name": "Shackleton–de Gerlache Ridge", "lat": -89.5, "lon": -100.0, "description": "High-illumination ridge between Shackleton and de Gerlache craters; PSR access for ice", "coordinate_status": "UNVERIFIED" },
+    { "name": "Marius Hills Pit", "lat": 14.1, "lon": -56.3, "description": "Lunar pit — probable lava-tube skylight; natural shelter candidate", "coordinate_status": "UNVERIFIED" }
+  ],
+  "default_characteristics": ["ice_polar", "illumination", "volcanic_caves", "thermal", "topography", "geology"],
+  "default_weights": {
+    "ice_polar": 0.25,
+    "illumination": 0.20,
+    "volcanic_caves": 0.15,
+    "thermal": 0.15,
+    "topography": 0.15,
+    "geology": 0.10
+  },
+  "topography_hard_cap_slope_deg": 12,
+  "topography_neighborhood_radius_km": 12
+}

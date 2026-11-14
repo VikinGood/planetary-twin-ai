@@ -1,0 +1,19 @@
+{
+  "body": "mars",
+  "mission_type": "base",
+  "reference_targets": [
+    { "name": "Arcadia Planitia", "lat": 46.7, "lon": -172.0, "description": "Shallow ground ice detected by SWIM; best current Mars ISRU water candidate", "coordinate_status": "UNVERIFIED" },
+    { "name": "Arsia Mons Cave Candidate", "lat": -8.3, "lon": -120.5, "description": "Candidate lava-tube pit on Arsia Mons flank (MGC³); natural shelter analog", "coordinate_status": "UNVERIFIED" }
+  ],
+  "default_characteristics": ["ice_polar", "volcanic_caves", "geology", "thermal", "aridity", "topography"],
+  "default_weights": {
+    "ice_polar": 0.25,
+    "volcanic_caves": 0.20,
+    "geology": 0.15,
+    "thermal": 0.15,
+    "aridity": 0.15,
+    "topography": 0.10
+  },
+  "topography_hard_cap_slope_deg": 12,
+  "topography_neighborhood_radius_km": 12
+}

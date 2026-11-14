@@ -1,0 +1,24 @@
+{
+  "body": "moon",
+  "mission_type": "landing",
+  "reference_targets": [
+    { "name": "Malapert Massif", "lat": -85.9, "lon": -3.5, "description": "High peak near south pole; persistent illumination candidate", "coordinate_status": "UNVERIFIED" },
+    { "name": "Mons Mouton", "lat": -84.5, "lon": -20.0, "description": "Plateau south of south pole; multiple NASA candidate regions", "coordinate_status": "UNVERIFIED" },
+    { "name": "Haworth Crater rim", "lat": -86.9, "lon": -5.6, "description": "PSR access and illumination ridge", "coordinate_status": "UNVERIFIED" },
+    { "name": "Slater Plain", "lat": -88.5, "lon": 55.0, "description": "Relatively flat plain near south pole", "coordinate_status": "UNVERIFIED" },
+    { "name": "Nobile Crater rim", "lat": -85.2, "lon": 53.5, "description": "Rim of large crater; ice access candidate", "coordinate_status": "UNVERIFIED" },
+    { "name": "Faustini Crater rim", "lat": -87.3, "lon": 77.0, "description": "PSR and illuminated rim candidate", "coordinate_status": "UNVERIFIED" },
+    { "name": "Shackleton Crater rim", "lat": -89.9, "lon": 0.0, "description": "South pole crater rim; near-continuous illumination", "coordinate_status": "UNVERIFIED" },
+    { "name": "Leibnitz Beta Plateau", "lat": -85.0, "lon": -170.0, "description": "High plateau; illumination and terrain candidate", "coordinate_status": "UNVERIFIED" },
+    { "name": "Connecting Ridge Extension", "lat": -88.0, "lon": -100.0, "description": "Ridge between Shackleton and de Gerlache", "coordinate_status": "UNVERIFIED" }
+  ],
+  "default_characteristics": ["topography", "surface_optics", "thermal", "illumination"],
+  "default_weights": {
+    "topography": 0.35,
+    "illumination": 0.25,
+    "surface_optics": 0.20,
+    "thermal": 0.20
+  },
+  "topography_hard_cap_slope_deg": 12,
+  "topography_neighborhood_radius_km": 12
+}

@@ -1,0 +1,19 @@
+{
+  "body": "mars",
+  "mission_type": "landing",
+  "reference_targets": [
+    { "name": "Jezero Crater", "lat": 18.4, "lon": 77.7, "description": "Ancient river delta and lake bed; Mars 2020 Perseverance landing site", "coordinate_status": "UNVERIFIED" },
+    { "name": "Gale Crater", "lat": -5.4, "lon": 137.8, "description": "Layered sedimentary mound; Mars Science Laboratory Curiosity site", "coordinate_status": "UNVERIFIED" },
+    { "name": "Meridiani Planum", "lat": -1.9, "lon": -5.5, "description": "Hematite-bearing plains; Mars Exploration Rover Opportunity site", "coordinate_status": "UNVERIFIED" }
+  ],
+  "default_characteristics": ["topography", "surface_optics", "aridity", "thermal"],
+  "default_weights": {
+    "topography": 0.40,
+    "surface_optics": 0.25,
+    "aridity": 0.20,
+    "thermal": 0.15
+  },
+  "topography_hard_cap_slope_deg": 12,
+  "topography_neighborhood_radius_km": 12,
+  "illumination_excluded_reason": "Mars sol-length day and lack of PSR equivalent make illumination a minor constraint for Martian landing sites. Aridity is more discriminating for Mars analog selection."
+}
