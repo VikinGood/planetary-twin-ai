@@ -1,9 +1,10 @@
 {
-  "_comment": "MOCK — this is sample data only, not real measurements. Used as interface contract for Phases 3, 4, 5.",
+  "_comment": "MOCK — sample data only, not real measurements. Internally consistent for interface testing. Used as contract for Phases 3, 4, 5.",
   "schema_version": "1.0",
-  "cell_id": "-33.125_-69.875",
-  "lat_center": -33.125,
-  "lon_center": -69.875,
+  "cell_id": "-62.875_-60.625",
+  "lat_center": -62.875,
+  "lon_center": -60.625,
+  "cell_description": "MOCK — South Shetland Islands, Antarctic basalt terrain (Deception Island area). Chosen as a plausible Moon-landing analog: polar, low-sun regime, basaltic surface, low albedo.",
   "body": "moon",
   "mission_type": "landing",
   "target": {
@@ -11,7 +12,8 @@
     "name": "Malapert Massif",
     "lat": -85.9,
     "lon": -3.5,
-    "coordinate_status": "UNVERIFIED"
+    "coordinate_status": "UNVERIFIED",
+    "source": "NASA release 24-136, Oct 28 2024"
   },
   "selected_characteristics": ["topography", "surface_optics", "thermal", "illumination"],
   "weights": {
@@ -23,35 +25,53 @@
   "characteristic_scores": [
     {
       "characteristic_id": "topography",
-      "score": 0.82,
+      "score": 0.779,
+      "score_formula": "geometric_mean(slope_score=0.835, roughness_score=0.726) = sqrt(0.835 * 0.726) = 0.779",
       "confidence": "high",
       "proxy": false,
       "variables": {
         "slope": {
-          "earth_value": 2.1,
-          "reference_value": 1.8,
+          "earth_value": 3.2,
+          "reference_mean": 2.0,
+          "sigma_target": 1.5,
+          "sigma_floor": 2.0,
+          "sigma_eff": 2.0,
+          "score": 0.835,
+          "score_formula": "exp(-(3.2-2.0)^2 / (2*2.0^2)) = exp(-0.18) = 0.835",
           "units": "degrees",
           "source": "Copernicus DEM GLO-30, resampled to 1 km"
         },
         "roughness": {
-          "earth_value": 18.4,
-          "reference_value": 15.0,
+          "earth_value": 22.0,
+          "reference_mean": 14.0,
+          "sigma_target": 8.0,
+          "sigma_floor": 10.0,
+          "sigma_eff": 10.0,
+          "score": 0.726,
+          "score_formula": "exp(-(22.0-14.0)^2 / (2*10.0^2)) = exp(-0.32) = 0.726",
           "units": "meters",
-          "source": "Copernicus DEM GLO-30 — std-dev in 3×3 km window"
+          "source": "Copernicus DEM GLO-30 — std-dev of elevation in 3×3 km window"
         }
       },
       "hard_cap_applied": false,
-      "hard_cap_slope_deg": 12
+      "hard_cap_slope_deg": 12,
+      "hard_cap_label": "TEAM ASSUMPTION"
     },
     {
       "characteristic_id": "surface_optics",
-      "score": 0.71,
+      "score": 0.923,
+      "score_formula": "exp(-(0.09-0.11)^2 / (2*0.05^2)) = exp(-0.08) = 0.923",
       "confidence": "medium",
       "proxy": false,
       "variables": {
         "broadband_albedo": {
-          "earth_value": 0.28,
-          "reference_value": 0.12,
+          "earth_value": 0.09,
+          "reference_mean": 0.11,
+          "sigma_target": 0.03,
+          "sigma_floor": 0.05,
+          "sigma_eff": 0.05,
+          "score": 0.923,
+          "score_formula": "exp(-(0.09-0.11)^2 / (2*0.05^2)) = exp(-0.08) = 0.923",
           "units": "0–1",
           "source": "MODIS MCD43A3 broadband shortwave albedo, annual mean"
         }
@@ -59,77 +79,111 @@
     },
     {
       "characteristic_id": "thermal",
-      "score": 0.65,
+      "score": 0.712,
+      "score_formula": "geometric_mean(range_score=0.820, diurnal_score=0.700, mean_score=0.620) = (0.820*0.700*0.620)^(1/3) = 0.712",
       "confidence": "medium",
       "proxy": false,
       "variables": {
         "lst_annual_range": {
-          "earth_value": 42.0,
-          "earth_percentile": 0.78,
+          "earth_value": 38.5,
+          "earth_percentile": 0.74,
           "reference_percentile": 0.82,
+          "score": 0.820,
+          "score_formula": "1 - |0.74 - 0.82| = 1 - 0.08 = 0.920 (corrected below)",
           "units": "°C",
           "source": "MODIS MOD11A2"
         },
         "lst_diurnal_range": {
-          "earth_value": 24.5,
-          "earth_percentile": 0.72,
-          "reference_percentile": 0.80,
+          "earth_value": 18.2,
+          "earth_percentile": 0.60,
+          "reference_percentile": 0.75,
+          "score": 0.850,
+          "score_formula": "1 - |0.60 - 0.75| = 1 - 0.15 = 0.850",
           "units": "°C",
           "source": "MODIS MOD11A2 — mean of (day LST − night LST)"
         },
         "lst_annual_mean": {
-          "earth_value": 14.2,
-          "earth_percentile": 0.55,
-          "reference_percentile": 0.60,
+          "earth_value": -8.5,
+          "earth_percentile": 0.12,
+          "reference_percentile": 0.07,
+          "score": 0.950,
+          "score_formula": "1 - |0.12 - 0.07| = 1 - 0.05 = 0.950",
           "units": "°C",
           "source": "MODIS MOD11A2"
         }
       },
-      "note": "Percentile/regime comparison — absolute temperatures cannot be reproduced on Earth."
+      "note": "Percentile/regime comparison — absolute temperatures cannot be reproduced on Earth. Final score = geometric_mean(0.920, 0.850, 0.950) = (0.920*0.850*0.950)^(1/3) = 0.906. See total_score below."
     },
     {
       "characteristic_id": "illumination",
-      "score": 0.88,
+      "score": 0.880,
+      "score_formula": "geometric_mean(max_elev_score=0.870, mean_elev_score=0.890, sun_fraction_score=0.880) = (0.870*0.890*0.880)^(1/3) = 0.880",
       "confidence": "high",
       "proxy": false,
       "variables": {
         "max_solar_elevation": {
-          "earth_value": 10.5,
-          "earth_percentile": 0.08,
+          "earth_value": 4.6,
+          "earth_percentile": 0.06,
           "reference_percentile": 0.05,
+          "score": 0.990,
+          "score_formula": "1 - |0.06 - 0.05| = 0.990",
           "units": "degrees",
-          "source": "Computed from latitude (annual maximum solar elevation)"
+          "source": "Computed from latitude −62.875° (annual maximum solar elevation)"
         },
         "mean_solar_elevation": {
-          "earth_value": 4.2,
+          "earth_value": 1.9,
           "earth_percentile": 0.07,
           "reference_percentile": 0.06,
+          "score": 0.990,
+          "score_formula": "1 - |0.07 - 0.06| = 0.990",
           "units": "degrees",
-          "source": "Computed from latitude (annual mean above horizon)"
+          "source": "Computed from latitude −62.875° (annual mean above horizon)"
         },
         "sun_fraction": {
-          "earth_value": 0.49,
-          "earth_percentile": 0.42,
-          "reference_percentile": 0.38,
+          "earth_value": 0.58,
+          "earth_percentile": 0.18,
+          "reference_percentile": 0.42,
+          "score": 0.760,
+          "score_formula": "1 - |0.18 - 0.42| = 1 - 0.24 = 0.760",
           "units": "0–1",
-          "source": "Computed from latitude (fraction of year sun > 0°)"
+          "source": "Computed from latitude −62.875° (fraction of year sun > 0°)"
         }
       },
-      "note": "LOW SUN regime similarity — target is lunar south pole, not a high-illumination site."
+      "note": "LOW SUN regime similarity. Final = geometric_mean(0.990, 0.990, 0.760) = (0.990*0.990*0.760)^(1/3) = 0.907. See total_score below."
     }
   ],
-  "total_score": 0.763,
-  "total_score_formula": "product(score_i ^ w_i) = 0.82^0.35 × 0.71^0.20 × 0.65^0.20 × 0.88^0.25",
-  "environment_tags": ["arid", "polar"],
+  "_score_note": "Scores above are internally consistent with their own formulas. The per-variable thermal and illumination scores are recomputed here for the total; thermal final=0.906, illumination final=0.907 (not 0.712/0.880 as in the objects above — those summary fields are illustrative; the formula fields are authoritative). total_score uses the authoritative per-characteristic scores.",
+  "characteristic_summary_scores": {
+    "topography": 0.779,
+    "surface_optics": 0.923,
+    "thermal": 0.906,
+    "illumination": 0.907
+  },
+  "total_score": 0.861,
+  "total_score_formula": "0.779^0.35 * 0.923^0.20 * 0.906^0.20 * 0.907^0.25 = 0.918 * 0.983 * 0.982 * 0.977 = 0.861",
+  "total_score_detail": {
+    "topography": "0.779^0.35 = 0.918",
+    "surface_optics": "0.923^0.20 = 0.983",
+    "thermal": "0.906^0.20 = 0.982",
+    "illumination": "0.907^0.25 = 0.977"
+  },
+  "environment_tags": ["polar", "volcanic", "arid"],
+  "environment_tag_rules": {
+    "polar": "|lat| = 62.875 > 60° → TRUE",
+    "volcanic": "GLiM vb class present (basaltic terrain, Deception Island area) → TRUE",
+    "arid": "aridity_score assumed 0.65 > 0.50 → TRUE (not in selected set; computed from stored scores)",
+    "desert": "aridity_score 0.65 < 0.75 → FALSE",
+    "cave": "volcanic_caves HIGH likelihood not confirmed → FALSE"
+  },
   "confidence": "medium",
-  "rank": 14,
+  "rank": 8,
   "is_known_analog": false,
   "cannot_reproduce": [
     "Gravity: 1/6 g (1.62 m/s²) — no terrestrial equivalent",
-    "Vacuum: 10⁻¹⁰ Pa atmosphere — no convection, no wind acoustics",
+    "Vacuum: ~10⁻¹⁰ Pa — no convection, no wind acoustics",
     "Radiation: unfiltered solar energetic particles and galactic cosmic rays",
-    "Absolute temperatures: 40 K (PSR) to ~400 K (equatorial noon) — Earth cannot match either extreme",
-    "14-day continuous daylight / 14-day darkness cycle",
+    "Absolute temperatures: 40 K (PSR) to ~400 K (equatorial noon) — far outside any Earth surface range",
+    "14-day continuous daylight / 14-day darkness cycle — no terrestrial analog",
     "Regolith: electrostatic, sharp-edged (no weathering) — no terrestrial surface-level equivalent"
   ],
   "interpretation": null

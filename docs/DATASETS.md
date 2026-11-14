@@ -46,8 +46,8 @@ No Moon dataset is natively hosted in Google Earth Engine.
 
 | characteristic | dataset_name | provider | url_or_access | resolution | units | format | license | coverage |
 |---|---|---|---|---|---|---|---|---|
-| `topography` | LOLA LDEM global DEM (LDEM_16) | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/missions/lro/lola.htm | ~118 m/px equatorial (16 ppd); 237 m (128 ppd) variant | m elevation (IAU r=1737.4 km) | PDS IMG/LBL + GeoTIFF (LROC WMS) | NASA public domain | Global; polar stereo DEMs to ±90° |
-| `topography` | SLDEM2015 (LOLA + Kaguya LALT fusion) — slope/roughness | NASA PDS / JAXA | https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/sldem2015/ | ~59 m/px (512 ppd) for ±60°; polar stereo ~20 m/px | degrees (slope); m (roughness) | GeoTIFF / PDS IMG | NASA/JAXA public domain | ±60° lat; polar region: use LOLA polar stereo DEMs |
+| `topography` **(scoring DEM)** | LOLA LDEM global DEM (LDEM_16) — resampled to 1 km for scoring | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/missions/lro/lola.htm | ~118 m/px equatorial (16 ppd); resampled to 1 km for slope/roughness/relief | m elevation (IAU r=1737.4 km) | PDS IMG/LBL + GeoTIFF (LROC WMS) | NASA public domain | Global; polar stereo DEMs to ±90° |
+| `topography` **(reference only — not used for scoring)** | SLDEM2015 (LOLA + Kaguya LALT fusion) | NASA PDS / JAXA | https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/sldem2015/ | ~59 m/px (512 ppd) for ±60° | degrees (slope); m (roughness) | GeoTIFF / PDS IMG | NASA/JAXA public domain | ±60° lat only |
 | `thermal` | Diviner DLRE GDR — temperature products | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/missions/lro/diviner.htm | 0.5°/px (~15 km) global; 128 ppd (~237 m) polar composites | K | PDS binary/LBL; GeoTIFF via PDS4 | NASA public domain | Global; continuous polar coverage |
 | `illumination` | LOLA polar illumination maps (Mazarico et al. 2011) | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/missions/lro/lola.htm (LOLA ancillary / illumination sub-product) | 240 m/px (polar stereo) | fraction 0–1 | PDS IMG/LBL + GeoTIFF | NASA public domain | Polar regions > ±70°; not global |
 | `ice_polar` | LROC PSR Atlas — permanently shadowed regions | LROC / ASU + USGS Astrogeology | https://pds.lroc.asu.edu ; https://astrogeology.usgs.gov | ~240 m/px (from LOLA illumination maps) | binary PSR polygon + area km² | Shapefile / GeoPackage | NASA public domain | South and north polar > ±70° |
@@ -60,12 +60,13 @@ No Moon dataset is natively hosted in Google Earth Engine.
 
 ### Notes on Moon datasets
 
+- **Common 1 km slope baseline (TEAM DECISION):** LOLA LDEM is the scoring DEM for the Moon; resampled to 1 km before computing slope/roughness/relief. SLDEM2015 and pre-derived LOLA slope products are listed for reference but NOT used for scoring.
 - **No EE hosting:** all Moon data must be downloaded from PDS/LROC and processed offline.
 - **LOLA illumination sub-product URL:** PDS volume structure for illumination maps not straightforward; confirm Mazarico et al. 2011 PDS4 DOI before preprocessing. UNVERIFIED.
 - **No merged ice-detection product:** LEND (10 km/px), Mini-RF, LCROSS, and M³ have never been officially merged. Use LEND hydrogen maps for global screening + M³ surface-ice map for south-pole validation. M³ added as fourth source (not in original `config/characteristics.json` list; added here as supplemental validation source, not scored).
 - **WAC reflectance vs. broadband albedo:** LROC WAC mosaic is single-band (604 nm), not broadband. Cross-calibration to MODIS broadband shortwave albedo (0.3–5 µm) is UNVERIFIED. Flag `surface_optics` scoring for Moon as PROXY / Low confidence if no cross-calibration factor is applied; apply percentile/regime comparison as fallback.
 - **Diviner resolution:** standard GDR global products are 0.5°/px (~15 km); 128 ppd (~237 m) polar composites exist but PDS volume paths need confirmation.
-- **Artemis 9 target coordinates (UNVERIFIED):** official coordinate table not released by NASA. Regions named in Oct 28 2024 press release: Faustini Rim A, Peak near Shackleton, Connecting Ridge, Connecting Ridge Extension, de Gerlache Rim 1, de Gerlache Rim 2, de Gerlache–Korolev–Shackleton (DKS), Haworth, Malapert Massif. Coordinates in `config/missions/moon-landing.json` are approximate and must be verified by team GIS lead (Ramiro) before Phase 6.
+- **Artemis 9 target coordinates (UNVERIFIED):** official coordinate table not released by NASA. Regions from NASA release 24-136 (Oct 28 2024): Peak near Cabeus B, Haworth, Malapert Massif, Mons Mouton Plateau, Mons Mouton, Nobile Rim 1, Nobile Rim 2, de Gerlache Rim 2, Slater Plain. Coordinates in `config/missions/moon-landing.json` are approximate from USGS Gazetteer and release map; must be verified by Ramiro (GIS) before Phase 6.
 
 ---
 
@@ -76,8 +77,8 @@ No Mars dataset is natively hosted in GEE.
 
 | characteristic | dataset_name | provider | url_or_access | resolution | units | format | license | coverage |
 |---|---|---|---|---|---|---|---|---|
-| `topography` | MOLA MEGDR global DEM (1/128°) | NASA PDS / USGS Astropedia | https://pds-geosciences.wustl.edu/missions/mgs/mola.htm | 463 m/px (1/128°) | m elevation (areoid) | PDS IMG/LBL; Astropedia GeoTIFF | NASA/USGS public domain | Global (90°S–90°N) |
-| `topography` | MOLA–HRSC Blended DEM (~200 m) | ESA/DLR / USGS Astropedia | https://ode.rsl.wustl.edu/mars/indexproductsearch.aspx | ~200 m/px | m elevation | GeoTIFF | ESA/DLR open science, attribution required | Global (blended; completeness UNVERIFIED) |
+| `topography` **(scoring DEM)** | MOLA MEGDR global DEM (1/128°) — resampled to 1 km for scoring | NASA PDS / USGS Astropedia | https://pds-geosciences.wustl.edu/missions/mgs/mola.htm | 463 m/px (1/128°); resampled to 1 km for slope/roughness/relief | m elevation (areoid) | PDS IMG/LBL; Astropedia GeoTIFF | NASA/USGS public domain | Global (90°S–90°N) |
+| `topography` **(reference only — not used for scoring)** | MOLA–HRSC Blended DEM (~200 m) | ESA/DLR / USGS Astropedia | https://ode.rsl.wustl.edu/mars/indexproductsearch.aspx | ~200 m/px | m elevation | GeoTIFF | ESA/DLR open science, attribution required | ~90% global (completeness UNVERIFIED) |
 | `surface_optics` | TES Bolometric Albedo (Christensen et al. 2001) | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-sddr-v1/ | ~3–8 km (UNVERIFIED — verify from PDS label) | Bond/bolometric albedo 0–1 | PDS IMG/LBL; Astropedia GeoTIFF | NASA public domain | Global; gaps over polar caps |
 | `surface_optics` | TES Dust Cover Index (Ruff & Christensen 2002) | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-sddr-v1/ | ~3–8 km | DCI index 0–1 | PDS IMG/LBL | NASA public domain | Global; reduced quality at poles |
 | `thermal` | TES Thermal Inertia (Putzig & Mellon 2007) | NASA PDS Geosciences Node | https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-sddr-v1/ | ~3–8 km | J m⁻² K⁻¹ s⁻½ (TIU) | PDS IMG/LBL | NASA public domain | Global; reduced accuracy near poles |
@@ -88,9 +89,10 @@ No Mars dataset is natively hosted in GEE.
 
 ### Notes on Mars datasets
 
+- **Common 1 km slope baseline (TEAM DECISION):** MOLA MEGDR (463 m) is the scoring DEM for Mars; resampled to 1 km before computing slope/roughness/relief. MOLA–HRSC blended DEM is listed for reference but NOT used for scoring (global completeness unconfirmed).
 - **MCD non-commercial license:** suitable for this project (educational/Space Apps). MCD is used at the **target level only** (single reference value per named target site, not a gridded input). The free 5° × 5° download suffices for this purpose.
 - **TES product pixel scale UNVERIFIED:** PDS label must be read to confirm exact pixel scale of the distributed mosaics. Resolution is stated as ~3 km in literature (Christensen et al. 2001) but PDS grids may differ.
-- **MOLA–HRSC blended DEM:** global seamless coverage is UNVERIFIED — HRSC strip coverage is ~90 % of Mars. Use MOLA 1/128° (463 m) as confirmed fallback; upgrade if Astropedia GeoTIFF label confirms global completeness.
+- **MOLA–HRSC blended DEM (reference only):** not used for scoring. Listed for reference. Global completeness is UNVERIFIED (~90% HRSC coverage).
 - **SWIM coverage gap:** equatorial band < 30° latitude has no SWIM ice signal. Mars landing targets at equatorial latitudes (Jezero, Gale, Meridiani) will have no ice_polar score — expected and correct (ice_polar is not in the mars-landing default preset).
 - **MGC³ field schema UNVERIFIED:** confirm candidate count and field names by downloading from ScienceBase doi:10.5066/P9VXZEF5 before Phase 3.
 

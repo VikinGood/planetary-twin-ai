@@ -8,7 +8,7 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | --- | --- | --- | --- | --- | --- |
 | 0 Setup | 00-kickoff-orchestrator.md | Space Apps Orchestrator | approved | Guillermo | |
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
-| 2 Data and architecture | 02-data-architecture.md | Plan | review | | |
+| 2 Data and architecture | 02-data-architecture.md | Plan | review (fixes applied) | | |
 | 3 Backend core | 03-backend.md | Agent | pending | | parallel with 4 and 5 |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
 | 5 Explorer dashboard | 05-frontend.md | Agent | pending | | parallel with 3 and 4 |
@@ -40,6 +40,21 @@ Status values: pending, in progress, review, approved, blocked.
   mars-base: ice_polar 0.25, volcanic_caves 0.20, geology 0.15, thermal 0.15, aridity 0.15, topography 0.10.
 - 2026-11-14: mars-landing preset excludes illumination; aridity replaces it.
   AGENTS.md default characteristic list for mars-landing updated accordingly.
+- 2026-11-14 (Phase 2 review fixes):
+  - Moon landing targets corrected to NASA release 24-136 (Oct 28 2024): Peak near Cabeus B,
+    Haworth, Malapert Massif, Mons Mouton Plateau, Mons Mouton, Nobile Rim 1, Nobile Rim 2,
+    de Gerlache Rim 2, Slater Plain. Previous list (Faustini, Shackleton rim, Leibnitz Beta,
+    Connecting Ridge Extension) was from 2022 Artemis III shortlist — removed.
+  - Common 1 km slope baseline: slope/roughness/relief computed from each body's native DEM
+    resampled to 1 km for all three bodies (Copernicus GLO-30 for Earth, LOLA LDEM for Moon,
+    MOLA MEGDR 463 m for Mars). LOLA slope products and MOLA-HRSC blended DEM not used for
+    scoring; retained as reference in DATASETS.md.
+  - Gaussian sigma floor added: σ_eff = max(σ_target, σ_floor). Floors: slope 2°,
+    roughness 10 m, local_relief 50 m, albedo 0.05. All labeled TEAM ASSUMPTION.
+  - Hard cap (12° slope) relabeled TEAM ASSUMPTION throughout all presets and METHODOLOGY.md.
+  - PANGAEA (GLiM, IPA GZI): confirm free download without registration before preprocessing;
+    if account required, free registration suffices (no commercial account needed).
+  - MOLA-HRSC blended DEM: retained in DATASETS.md as reference-only; not needed for scoring.
 
 ## Contracts (files other phases depend on)
 
@@ -52,11 +67,11 @@ Status values: pending, in progress, review, approved, blocked.
 
 ## Open questions for the team
 
-- **Moon target coordinates (UNVERIFIED):** nine NASA Artemis south-polar landing regions announced Oct 28 2024 have no official GIS file. Coordinates in moon-landing.json are approximate. Ramiro (GIS) must verify before Phase 6. NASA press release: https://www.nasa.gov/news-release/nasa-identifies-candidate-regions-for-artemis-lunar-landing/
-- **Mars target coordinates (UNVERIFIED):** Jezero, Gale, Meridiani are well-known and likely correct; Arcadia Planitia center and Arsia Mons pit coordinates need GIS verification.
+- **Moon target coordinates (UNVERIFIED):** targets corrected to NASA release 24-136. Approximate coordinates from USGS Gazetteer and release map image. Ramiro (GIS) must verify against NASA's official region maps before Phase 6.
+- **Mars target coordinates (UNVERIFIED):** Jezero, Gale, Meridiani well-known; Arcadia Planitia center and Arsia Mons pit coordinates need GIS verification before Phase 6.
 - **LOLA illumination sub-product URL:** PDS volume path for Mazarico et al. 2011 illumination maps needs confirmation before Moon preprocessing begins.
 - **TES pixel scale:** PDS label must be read to confirm exact resolution of TES bolometric albedo, thermal inertia, and DCI mosaics (stated ~3–8 km in literature).
-- **MOLA–HRSC blended DEM completeness:** confirm global seamless coverage from Astropedia label before using as primary Mars DEM.
+- ~~MOLA–HRSC blended DEM completeness~~ — resolved: MOLA MEGDR is the scoring DEM; HRSC blended is reference-only, completeness no longer a blocker.
 - **MGC³ field schema:** download from ScienceBase doi:10.5066/P9VXZEF5 to confirm candidate count and field names.
 - **NASA Planetary Pits and Caves Analog Dataset URL:** locate exact ScienceBase URL before Phase 3; needed for volcanic_caves proxy validation.
 - **NASA Astrobiology Field Sites bulk download:** confirm if machine-readable CSV/GeoJSON export is available; if not, manually curate.
@@ -65,7 +80,7 @@ Status values: pending, in progress, review, approved, blocked.
 ## Accounts the team must create before preprocessing
 
 - Google Earth Engine (all members who run scripts): https://earthengine.google.com — free non-commercial registration.
-- PANGAEA (to download GLiM and IPA GZI): https://pangaea.de — free registration.
+- PANGAEA (to download GLiM and IPA GZI): https://pangaea.de — try direct download first (some datasets are openly accessible without login); free registration is sufficient if required.
 - Mars Climate Database (for high-res MCD runs, optional): https://www-mars.lmd.jussieu.fr/mars/access.html — free registration.
 - NASA Earthdata (for MODIS direct download, optional — not needed if using EE): https://urs.earthdata.nasa.gov
 

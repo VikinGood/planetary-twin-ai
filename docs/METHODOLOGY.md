@@ -33,27 +33,49 @@ Only the user-selected characteristics enter the product; unselected ones are st
 
 ### 2.1 topography
 
-**Comparison rule:** Absolute (same units; different scoring curve per mission type).  
-**Earth variables:** slope (°) and roughness (std-dev of elevation in m) from Copernicus DEM
-GLO-30 (30 m); resampled to 1 km working resolution; local relief (range of elevation in
-m within 10–15 km neighborhood radius) for permanent-base scoring.  
-**Moon variables:** slope and roughness from LOLA slope products; relief from LOLA DEM.  
-**Mars variables:** slope and roughness from MOLA/MOLA-HRSC blended DEM (200 m); relief from same.
+**Comparison rule:** Absolute (same units; different scoring curve per mission type).
+
+**Common DEM baseline (all three bodies — TEAM DECISION):**
+Slope, roughness, and local relief are computed from each body's DEM **resampled to a
+common 1 km grid** before any derivative is calculated. This ensures like-for-like
+comparison. Pre-derived LOLA slope products and the MOLA–HRSC blended DEM are NOT used
+for scoring; they are listed in DATASETS.md for reference only.
+
+- **Earth:** Copernicus DEM GLO-30 (30 m native) → bilinear resample to 1 km.
+- **Moon:** LOLA LDEM gridded DEM (native ~118 m at 16 ppd) → bilinear resample to 1 km.
+- **Mars:** MOLA MEGDR (native ~463 m at 1/128°) → bilinear resample to 1 km.
+
+**Earth variables** (derived from 1 km resampled Copernicus DEM GLO-30):
+slope (°), roughness (std-dev of elevation in m in 3×3 km window), local relief (range of
+elevation in m within 12 km neighborhood radius).
+
+**Moon variables** (derived from 1 km resampled LOLA LDEM):
+slope (°), roughness (m), local relief (m) — same algorithms as Earth side.
+
+**Mars variables** (derived from 1 km resampled MOLA MEGDR):
+slope (°), roughness (m), local relief (m) — same algorithms as Earth side.
+
+**Gaussian scoring with sigma floor (TEAM ASSUMPTION):**
+`score = exp( −(x − μ_target)² / (2 × σ_eff²) )`
+where `σ_eff = max(σ_target, σ_floor)` to avoid near-zero scores from homogeneous targets.
+σ_floor values (team assumptions — labeled in UI; to be validated in Phase 6):
+- slope: **σ_floor = 2°**
+- roughness: **σ_floor = 10 m**
+- local_relief: **σ_floor = 50 m**
 
 **Landing site scoring:**
-- Variable: local slope (°) and roughness (m) at the cell.
-- Scoring: Gaussian similarity to the target's mean slope and roughness.
-  `score = exp( −(x − μ_target)² / (2σ_target²) )`
-  where σ_target is the standard deviation of slope/roughness within the target region.
-- **Hard cap:** cells with slope > maximum acceptable landing slope score 0.
-  Default cap: **12°** (source: NASA Human Landing System terrain hazard threshold;
-  Apollo operations used ≤ 12° for safe touchdown). State in preset metadata.
+- Variables: local slope (°) and roughness (m) at the cell.
+- Scoring: Gaussian similarity with σ_floor applied (see above).
+- **Hard cap (TEAM ASSUMPTION):** cells with slope > **12°** score 0 for topography.
+  Basis: Apollo surface operations used slopes ≤ 12° as a practical safe limit.
+  No verifiable mission-specific HLS threshold has been confirmed; labeled as a team
+  assumption in preset metadata. Must be validated against mission-specific specs.
 - Final: geometric mean of slope score and roughness score.
 
 **Permanent base scoring — two parts, equal weight:**
 - (a) Buildable ground: local slope scored identically to landing site (same hard cap applies).
 - (b) Surrounding relief: local relief within a **12 km neighborhood radius** computed from
-  the DEM; scored by similarity to the target's relief profile.
+  the DEM; scored by Gaussian similarity with σ_floor = 50 m.
   Rationale for 12 km: a base support perimeter of roughly one day's surface traverse.
 - Final: geometric mean of (a) and (b).
 
@@ -137,9 +159,11 @@ LROC permanently shadowed regions (PSR) atlas, lunar ice detections.
 **Moon variables:** LROC WAC reflectance (normalized to same wavelength range if possible).  
 **Mars variables:** TES bolometric albedo.
 
-**Scoring:** Gaussian similarity to target's mean albedo:
-`score = exp( −(albedo_earth − albedo_target)² / (2 × 0.05²) )`.
-σ = 0.05 (absolute albedo units); adjust per body if target spread differs.
+**Scoring:** Gaussian similarity to target's mean albedo with sigma floor:
+`score = exp( −(albedo_earth − albedo_target)² / (2 × σ_eff²) )`
+where `σ_eff = max(σ_target, 0.05)`.
+**σ_floor = 0.05** (absolute albedo units, team assumption) prevents near-zero scores
+when the target has a very uniform surface. Adjust σ_target per body from actual spread.
 
 ### 2.8 illumination
 

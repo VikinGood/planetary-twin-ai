@@ -4,23 +4,30 @@
     "name": "Topography",
     "description": "Slope, roughness, and local relief — primary safety and construction constraint.",
     "comparison_rule": "absolute",
+    "dem_baseline_note": "TEAM DECISION: slope, roughness, and local relief computed from each body's DEM resampled to 1 km. No pre-derived slope products or MOLA-HRSC blended DEM used for scoring.",
     "landing_hard_cap_slope_deg": 12,
-    "landing_hard_cap_source": "NASA Human Landing System terrain hazard threshold (Apollo operations ≤12°)",
+    "landing_hard_cap_label": "TEAM ASSUMPTION — Apollo practical threshold; no verifiable HLS spec confirmed",
     "base_neighborhood_radius_km": 12,
+    "gaussian_sigma_floors": {
+      "slope_deg": 2.0,
+      "roughness_m": 10.0,
+      "local_relief_m": 50.0,
+      "label": "TEAM ASSUMPTION — prevents near-zero scores from homogeneous targets; to be validated in Phase 6"
+    },
     "earth_variables": [
       { "name": "slope", "source": "Copernicus DEM GLO-30, resampled to 1 km", "units": "degrees" },
       { "name": "roughness", "source": "Copernicus DEM GLO-30 — std-dev of elevation in 3×3 km window", "units": "meters" },
       { "name": "local_relief", "source": "Copernicus DEM GLO-30 — elevation range in 12 km neighborhood", "units": "meters" }
     ],
     "moon_variables": [
-      { "name": "slope", "source": "LOLA slope products (polar and global)", "units": "degrees" },
-      { "name": "roughness", "source": "LOLA DEM — std-dev of elevation in equivalent window", "units": "meters" },
-      { "name": "local_relief", "source": "LOLA DEM — elevation range in 12 km neighborhood", "units": "meters" }
+      { "name": "slope", "source": "LOLA LDEM gridded DEM, resampled to 1 km", "units": "degrees" },
+      { "name": "roughness", "source": "LOLA LDEM — std-dev of elevation in 3×3 km window", "units": "meters" },
+      { "name": "local_relief", "source": "LOLA LDEM — elevation range in 12 km neighborhood", "units": "meters" }
     ],
     "mars_variables": [
-      { "name": "slope", "source": "MOLA/MOLA-HRSC blended DEM (200 m)", "units": "degrees" },
-      { "name": "roughness", "source": "MOLA/MOLA-HRSC — std-dev of elevation", "units": "meters" },
-      { "name": "local_relief", "source": "MOLA/MOLA-HRSC — elevation range in 12 km neighborhood", "units": "meters" }
+      { "name": "slope", "source": "MOLA MEGDR (463 m), resampled to 1 km", "units": "degrees" },
+      { "name": "roughness", "source": "MOLA MEGDR — std-dev of elevation in 3×3 km window", "units": "meters" },
+      { "name": "local_relief", "source": "MOLA MEGDR — elevation range in 12 km neighborhood", "units": "meters" }
     ],
     "score_range": [0, 1],
     "supported_bodies": ["moon", "mars"]
@@ -146,8 +153,9 @@
     "name": "Surface Optics",
     "description": "Albedo and dust — affects imaging, thermal balance, and surface operations.",
     "comparison_rule": "absolute",
-    "scoring_sigma": 0.05,
-    "scoring_note": "Gaussian similarity: score = exp(−(albedo_earth − albedo_target)² / (2 × 0.05²)).",
+    "gaussian_sigma_floor": 0.05,
+    "gaussian_sigma_floor_label": "TEAM ASSUMPTION — prevents near-zero scores from uniform surfaces; to be validated in Phase 6",
+    "scoring_note": "Gaussian similarity with sigma floor: score = exp(−(albedo_earth − albedo_target)² / (2 × σ_eff²)), σ_eff = max(σ_target, 0.05).",
     "earth_variables": [
       { "name": "broadband_albedo", "source": "MODIS MCD43A3 broadband shortwave albedo, annual mean", "units": "0–1" }
     ],

@@ -15,5 +15,6 @@
     "topography": 0.10
   },
   "topography_hard_cap_slope_deg": 12,
+  "topography_hard_cap_label": "TEAM ASSUMPTION — Apollo practical threshold; no verifiable HLS spec confirmed",
   "topography_neighborhood_radius_km": 12
 }
