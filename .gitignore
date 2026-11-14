@@ -1,0 +1,27 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+.yarn/cache/
+.yarn/install-state.gz
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Data (large or regenerable)
+data/raw/
+*.parquet
+*.tif
+*.tiff
+
+# OS and sync artifacts
+desktop.ini
+Thumbs.db
+.DS_Store
