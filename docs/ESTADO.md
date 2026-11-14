@@ -9,7 +9,7 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | 0 Setup | 00-kickoff-orchestrator.md | Space Apps Orchestrator | approved | Guillermo | |
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
 | 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
-| 3 Backend core | 03-backend.md | Agent | pending | | parallel with 4 and 5 |
+| 3 Backend core | 03-backend.md | Agent | in progress | | subtask 3a done; 3b/3c pending |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
 | 5 Explorer dashboard | 05-frontend.md | Agent | pending | | parallel with 3 and 4 |
 | 6 Validation | 06-validation.md | Science Reviewer + Agent | pending | | |
@@ -55,6 +55,16 @@ Status values: pending, in progress, review, approved, blocked.
   - PANGAEA (GLiM, IPA GZI): confirm free download without registration before preprocessing;
     if account required, free registration suffices (no commercial account needed).
   - MOLA-HRSC blended DEM: retained in DATASETS.md as reference-only; not needed for scoring.
+- 2026-11-14 (Phase 3a):
+  - GLiM integer-to-class mapping: assumes standard Hartmann & Moosdorf 2012 encoding
+    (1=vb, 2=va, … 15=ice). Adjust GLIM_INT_TO_CLASS dict in 05_geology.py if the PANGAEA
+    raster uses a different encoding (read the .tif metadata on first download).
+  - 00_assemble.py uses union of all per-characteristic lat/lon grids; land_fraction=1.0
+    placeholder (Phase 3b to add a proper fractional land mask).
+  - known_analog_within_km=-1.0 placeholder throughout; Phase 3c populates real values.
+  - GVP qualifying types from config/characteristics.json: "Shield volcano", "Fissure vent(s)",
+    "Volcanic field", "Lava dome(s)". Note: AGENTS.md listed "Lava dome(s)" but
+    characteristics.json also lists it — no conflict.
 
 ## Contracts (files other phases depend on)
 
@@ -64,6 +74,12 @@ Status values: pending, in progress, review, approved, blocked.
 - `contracts/interpretation.schema.json`: ✅ produced in Phase 2.
 - `docs/DATASETS.md`: ✅ produced in Phase 2.
 - `docs/ARCHITECTURE.md`: ✅ produced in Phase 2.
+- `backend/requirements.txt`: ✅ produced in Phase 3a (deps installed in .venv).
+- `scripts/earth/01_topography.py` through `scripts/earth/08_illumination.py`: ✅ Phase 3a.
+- `scripts/earth/00_assemble.py`: ✅ Phase 3a.
+- `scripts/README.md`: ✅ Phase 3a.
+- `data/processed/earth_illumination_025deg.parquet`: ✅ produced (pure computation, 1,036,800 cells).
+- `data/processed/earth_cells_025deg.parquet`: ✅ partial (illumination only; 7 chars pending raw data).
 
 ## Open questions for the team
 

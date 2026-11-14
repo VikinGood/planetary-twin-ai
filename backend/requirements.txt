@@ -1,0 +1,27 @@
+# Backend Python dependencies — Planetary Twin AI
+# AI use disclosure: this file was generated with AI assistance.
+# Pin versions to ensure reproducibility.
+# Install into .venv: pip install -r backend/requirements.txt
+
+# Google Earth Engine
+earthengine-api>=1.7.52
+
+# Geospatial
+geopandas>=1.2.0
+rasterio>=1.5.2
+shapely>=2.2.0
+geemap>=0.39.0
+
+# Data
+numpy>=2.5.4
+pyarrow>=26.0.1
+fastparquet>=2026.9.0
+pandas>=2.2.0
+
+# Utilities
+python-dotenv>=1.2.4
+tqdm>=4.70.1
+
+# API (Phase 3b onwards)
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
