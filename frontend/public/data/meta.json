@@ -1,6 +1,6 @@
 {
  "mock": false,
- "generated_at": "2026-11-15T03:58:07.577609+00:00",
+ "generated_at": "2026-11-15T04:28:17.063688+00:00",
  "note": "Production static export generated from processed NASA Earth Engine DEM, MODIS, and TerraClimate datasets.",
  "characteristics": [
   {
@@ -312,7 +312,7 @@
    "lon": -89.68,
    "body": "Moon,Mars",
    "type": "Impact crater / polar desert",
-   "source_url": "https://www.nasa.gov/centers-and-facilities/ames/haughton-mars-project/"
+   "source_url": "https://www.marsonearth.org/"
   },
   {
    "name": "Atacama Desert (Yungay)",
@@ -320,7 +320,7 @@
    "lon": -69.87,
    "body": "Mars",
    "type": "Hyperarid desert / astrobiology",
-   "source_url": "https://astrobiology.nasa.gov/news/yungay-the-driest-place-on-earth/"
+   "source_url": "https://www.nasa.gov/ames/arads"
   },
   {
    "name": "McMurdo Dry Valleys",
@@ -328,7 +328,7 @@
    "lon": 162.0,
    "body": "Mars",
    "type": "Cold polar desert / permafrost",
-   "source_url": "https://www.usgs.gov/centers/astrogeology-science-center/science/terrestrial-analogs"
+   "source_url": "https://mcm.lternet.edu/"
   },
   {
    "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
@@ -336,7 +336,7 @@
    "lon": -155.47,
    "body": "Moon,Mars",
    "type": "Basaltic volcanic terrain / habitat analog",
-   "source_url": "https://hi-seas.org/"
+   "source_url": "https://moonbasealliance.com/hi-seas"
   },
   {
    "name": "Lanzarote (PANGAEA)",
@@ -344,7 +344,7 @@
    "lon": -13.67,
    "body": "Moon,Mars",
    "type": "Basaltic lava tubes / planetary field training",
-   "source_url": "https://www.esa.int/Enabling_Support/Space_Transportation/PANGAEA"
+   "source_url": "https://en.wikipedia.org/wiki/ESA_PANGAEA"
   },
   {
    "name": "Rio Tinto",
@@ -352,7 +352,7 @@
    "lon": -6.65,
    "body": "Mars",
    "type": "Acidic iron-sulfate system / astrobiology",
-   "source_url": "https://astrobiology.nasa.gov/news/acid-river-mars-analog/"
+   "source_url": "https://en.wikipedia.org/wiki/Rio_Tinto_(river)"
   },
   {
    "name": "Mars Desert Research Station (Utah)",
@@ -368,7 +368,7 @@
    "lon": 13.35,
    "body": "Mars",
    "type": "Basaltic polar permafrost / carbonate rosettes",
-   "source_url": "https://www.nasa.gov/missions/amase/"
+   "source_url": "https://en.wikipedia.org/wiki/Arctic_Mars_Analog_Svalbard_Expedition"
   },
   {
    "name": "Craters of the Moon (Idaho)",
@@ -376,7 +376,7 @@
    "lon": -113.52,
    "body": "Moon",
    "type": "Basaltic flood lava / rift fissures",
-   "source_url": "https://www.nps.gov/crmo/learn/nature/apollo-astronauts.htm"
+   "source_url": "https://www.nps.gov/crmo/index.htm"
   },
   {
    "name": "SP Crater / Black Point Lava Flow (AZ)",
@@ -384,7 +384,7 @@
    "lon": -111.64,
    "body": "Moon,Mars",
    "type": "Basaltic cinder cone / NASA Desert RATS",
-   "source_url": "https://www.nasa.gov/exploration/technology/desert_rats/"
+   "source_url": "https://en.wikipedia.org/wiki/Desert_Research_and_Technology_Studies"
   },
   {
    "name": "Ries Crater",

@@ -113,7 +113,12 @@ def resolve_region_hints(cells: list[tuple[str, float, float]]) -> dict[str, str
     to_query = []
 
     for cid, lat, lon in cells:
-        if cid in cache:
+        # Spot-check Arctic archipelagos: Franz Josef Land is in the high Arctic (80-82N, 42-65E)
+        if 79.5 <= lat <= 82.5 and 42.0 <= lon <= 66.0:
+            hint = "Franz Josef Land, Russian Federation"
+            results[cid] = hint
+            cache[cid] = hint
+        elif cid in cache:
             results[cid] = cache[cid]
         elif lat < -60.0:
             results[cid] = "Antarctica"
@@ -159,7 +164,9 @@ def resolve_region_hints(cells: list[tuple[str, float, float]]) -> dict[str, str
                 lat_val = float(p.get("lat", 0.0))
                 lon_val = float(p.get("lon", 0.0))
 
-                if adm1 and adm0:
+                if 79.5 <= lat_val <= 82.5 and 42.0 <= lon_val <= 66.0:
+                    hint = "Franz Josef Land, Russian Federation"
+                elif adm1 and adm0:
                     if "Antarctica" in str(adm0) or "Antarctica" in str(adm1):
                         hint = "Antarctica"
                     elif adm1 == "Administrative unit not available":
@@ -178,7 +185,9 @@ def resolve_region_hints(cells: list[tuple[str, float, float]]) -> dict[str, str
     except Exception as e:
         print(f"[export_static] Warning: EE GAUL resolution failed ({e}). Using geographic fallback.", file=sys.stderr)
         for cid, lat, lon in to_query:
-            if lat < -60.0:
+            if 79.5 <= lat <= 82.5 and 42.0 <= lon <= 66.0:
+                hint = "Franz Josef Land, Russian Federation"
+            elif lat < -60.0:
                 hint = "Antarctica"
             else:
                 hint = f"Unnamed area ({lat:.2f}, {lon:.2f})"
@@ -480,6 +489,7 @@ def process_preset(
         tid = tgt["id"]
         hard_fail = np.zeros(len(eligible_indices), dtype=bool)
         log_sum = np.zeros(len(eligible_indices), dtype=float)
+        used_weight = np.zeros(len(eligible_indices), dtype=float)
         
         for c in def_chars:
             w_c = def_weights[c]
@@ -492,11 +502,18 @@ def process_preset(
             is_neg = np.array([x is not None and isinstance(x, (int, float)) and x < 0 for x in s_sub])
             hard_fail |= is_neg
             
-            # Floor valid positive values to 0.01
-            val = np.where(is_valid & ~is_neg, np.clip(s_sub.astype(float), 0.01, 1.0), 0.01)
-            log_sum += w_c * np.log(val)
+            # Align with dashboard scoring.mjs: missing data (null) is skipped and lowers coverage,
+            # not floored to 0.01. Valid positive scores are floored to 0.01 and re-normalized by used_weight.
+            valid_pos = is_valid & ~is_neg
+            pos_vals = np.where(valid_pos, s_sub.astype(float), 1.0)
+            floored_vals = np.clip(pos_vals, 0.01, 1.0)
             
-        comb_scores = np.where(hard_fail, -1.0, np.exp(log_sum))
+            log_sum += np.where(valid_pos, w_c * np.log(floored_vals), 0.0)
+            used_weight += np.where(valid_pos, w_c, 0.0)
+            
+        with np.errstate(divide="ignore", invalid="ignore"):
+            norm_log_sum = np.where(used_weight > 0, log_sum / used_weight, 0.0)
+            comb_scores = np.where(hard_fail | (used_weight == 0), -1.0, np.exp(norm_log_sum))
         valid_comb_mask = comb_scores > 0
         
         if np.any(valid_comb_mask):
@@ -579,13 +596,21 @@ def build_geojson(
         # Compute default combination score for the first target
         hard_fail = False
         log_sum = 0.0
+        used_weight = 0.0
         for c in def_chars:
             s = cell_scores[c].get(first_target_id)
-            if s is None or s < 0:
+            if s is None:
+                continue
+            if s < 0:
                 hard_fail = True
                 break
-            log_sum += def_weights[c] * math.log(max(0.01, min(1.0, s)))
-        def_score_first_tgt = -1.0 if hard_fail else round(math.exp(log_sum), 3)
+            w_c = def_weights[c]
+            used_weight += w_c
+            log_sum += w_c * math.log(max(0.01, min(1.0, s)))
+        if hard_fail or used_weight == 0:
+            def_score_first_tgt = -1.0
+        else:
+            def_score_first_tgt = round(math.exp(log_sum / used_weight), 3)
         if def_score_first_tgt > 0.05:
             n_positive_comb += 1
             

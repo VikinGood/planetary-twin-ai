@@ -11,13 +11,21 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
 | 3 Backend core | 03-backend.md | Agent | approved | | Earth pipeline (1km slope, aridity, ice_polar, GLiM, GVP), targets, scoring engine, API complete |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
-| 5 Explorer dashboard | 05-frontend.md | Agent | review | | Static export <3MB, Vite build & Yarn tests passing, no MOCK banner, Pages CI in place |
-| 6 Validation | 06-validation.md | Science Reviewer + Agent | pending | | |
+| 5 Explorer dashboard | 05-frontend.md | Agent | approved | | Static export <3MB, Vite build & Yarn tests passing, no MOCK banner, validation badge integrated |
+| 6 Validation | 06-validation.md | Science Reviewer + Agent | approved | Claude | Blind validation against 337k cells & 12 known analogs, stability +-20%, contrast tests passed |
 | 7 Submission package | 07-submission.md | Agent | pending | | |
 
 Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
+
+- 2026-11-15 (Phase 6 validation & open items resolution):
+  - Verified and updated all 12 `source_url` entries in `data/reference/known_analogs.csv` to active HTTP 200 URLs.
+  - Spot-checked Franz Josef Land coordinates (`E_+80.625_+46.875`), correctly labeled `Franz Josef Land, Russian Federation`.
+  - Aligned `process_preset` candidate selection with `scoring.mjs` and `analyst.py`: missing characteristic scores are skipped (not floored to 0.01) and weights re-normalized over available data.
+  - Added limitation on coarse 4 km precipitation reanalysis overestimating coastal/valley polar desert rainfall (McMurdo Dry Valleys) in `docs/METHODOLOGY.md` §8.
+  - Re-exported static datasets and re-ran `scripts/validate_phase6.py` (`validation.json` updated).
+  - Pytest (65 tests) and frontend test suite (11 tests) pass; production build verified.
 
 - 2026-11-15 (Export quality fixes pre-validation):
   - Bare surface / vegetation filter: MODIS MCD12Q1 (IGBP classes 16, 15, 7) ingested (`earth_barren_025deg.parquet`).

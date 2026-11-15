@@ -1,13 +1,13 @@
 name,lat,lon,body,type,source_url
-"Haughton Crater (Devon Island)",75.38,-89.68,"Moon,Mars","Impact crater / polar desert",https://www.nasa.gov/centers-and-facilities/ames/haughton-mars-project/
-"Atacama Desert (Yungay)",-24.08,-69.87,"Mars","Hyperarid desert / astrobiology",https://astrobiology.nasa.gov/news/yungay-the-driest-place-on-earth/
-"McMurdo Dry Valleys",-77.53,162.00,"Mars","Cold polar desert / permafrost",https://www.usgs.gov/centers/astrogeology-science-center/science/terrestrial-analogs
-"Mauna Kea / Mauna Loa (HI-SEAS)",19.82,-155.47,"Moon,Mars","Basaltic volcanic terrain / habitat analog",https://hi-seas.org/
-"Lanzarote (PANGAEA)",29.03,-13.67,"Moon,Mars","Basaltic lava tubes / planetary field training",https://www.esa.int/Enabling_Support/Space_Transportation/PANGAEA
-"Rio Tinto",37.70,-6.65,"Mars","Acidic iron-sulfate system / astrobiology",https://astrobiology.nasa.gov/news/acid-river-mars-analog/
+"Haughton Crater (Devon Island)",75.38,-89.68,"Moon,Mars","Impact crater / polar desert",https://www.marsonearth.org/
+"Atacama Desert (Yungay)",-24.08,-69.87,"Mars","Hyperarid desert / astrobiology",https://www.nasa.gov/ames/arads
+"McMurdo Dry Valleys",-77.53,162.00,"Mars","Cold polar desert / permafrost",https://mcm.lternet.edu/
+"Mauna Kea / Mauna Loa (HI-SEAS)",19.82,-155.47,"Moon,Mars","Basaltic volcanic terrain / habitat analog",https://moonbasealliance.com/hi-seas
+"Lanzarote (PANGAEA)",29.03,-13.67,"Moon,Mars","Basaltic lava tubes / planetary field training",https://en.wikipedia.org/wiki/ESA_PANGAEA
+"Rio Tinto",37.70,-6.65,"Mars","Acidic iron-sulfate system / astrobiology",https://en.wikipedia.org/wiki/Rio_Tinto_(river)
 "Mars Desert Research Station (Utah)",38.41,-110.79,"Mars","Inverted fluvial channels / mudstones",https://mdrs.marssociety.org/
-"Svalbard (AMASE / Bockfjord)",79.45,13.35,"Mars","Basaltic polar permafrost / carbonate rosettes",https://www.nasa.gov/missions/amase/
-"Craters of the Moon (Idaho)",43.43,-113.52,"Moon","Basaltic flood lava / rift fissures",https://www.nps.gov/crmo/learn/nature/apollo-astronauts.htm
-"SP Crater / Black Point Lava Flow (AZ)",35.58,-111.64,"Moon,Mars","Basaltic cinder cone / NASA Desert RATS",https://www.nasa.gov/exploration/technology/desert_rats/
+"Svalbard (AMASE / Bockfjord)",79.45,13.35,"Mars","Basaltic polar permafrost / carbonate rosettes",https://en.wikipedia.org/wiki/Arctic_Mars_Analog_Svalbard_Expedition
+"Craters of the Moon (Idaho)",43.43,-113.52,"Moon","Basaltic flood lava / rift fissures",https://www.nps.gov/crmo/index.htm
+"SP Crater / Black Point Lava Flow (AZ)",35.58,-111.64,"Moon,Mars","Basaltic cinder cone / NASA Desert RATS",https://en.wikipedia.org/wiki/Desert_Research_and_Technology_Studies
 "Ries Crater",48.88,10.55,"Moon","Suevite impact crater / Apollo field training",https://www.geopark-ries.de/
 "Kilauea Volcano",19.42,-155.29,"Moon,Mars","Active basaltic volcanism / basaltic glass",https://www.usgs.gov/volcanoes/kilauea

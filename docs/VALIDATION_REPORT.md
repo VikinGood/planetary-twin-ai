@@ -1,6 +1,6 @@
 # Phase 6 validation report
 
-Data: `frontend/public/data` (mock=False, generated 2026-11-15T03:58:07.577609+00:00).
+Data: `frontend/public/data` (mock=False, generated 2026-11-15T04:28:17.063688+00:00).
 
 ## 1. Known-analog recall (default characteristics, known analogs not excluded)
 
@@ -15,13 +15,13 @@ Data: `frontend/public/data` (mock=False, generated 2026-11-15T03:58:07.577609+0
 | moon_landing | nobile_rim_2 | 113 | 302 of 755 | 20 | 0/111 |
 | moon_landing | de_gerlache_rim_2 | 113 | 302 of 755 | 20 | 0/111 |
 | moon_landing | slater_plain | 113 | 302 of 755 | 20 | 0/111 |
-| moon_base | shackleton_de_gerlache_ridge | 113 | 473 of 1324 | 17 | 0/111 |
-| moon_base | marius_hills_pit | 113 | 436 of 1324 | 10 | 0/111 |
+| moon_base | shackleton_de_gerlache_ridge | 113 | 474 of 1323 | 17 | 0/111 |
+| moon_base | marius_hills_pit | 113 | 434 of 1323 | 11 | 0/111 |
 | mars_landing | jezero_crater | 113 | 474 of 1074 | 34 | 0/111 |
 | mars_landing | gale_crater | 113 | 477 of 1074 | 34 | 0/111 |
 | mars_landing | meridiani_planum | 113 | 472 of 1074 | 34 | 0/111 |
-| mars_base | arcadia_planitia | 113 | 460 of 1171 | 10 | 0/111 |
-| mars_base | arsia_mons_cave_candidate | 113 | 425 of 1171 | 11 | 0/111 |
+| mars_base | arcadia_planitia | 113 | 459 of 1173 | 10 | 0/111 |
+| mars_base | arsia_mons_cave_candidate | 113 | 409 of 1173 | 11 | 0/111 |
 
 Known analogs present in the export: 12 of 12: Atacama Desert (Yungay), Craters of the Moon (Idaho), Haughton Crater (Devon Island), Kilauea Volcano, Lanzarote (PANGAEA), Mars Desert Research Station (Utah), Mauna Kea / Mauna Loa (HI-SEAS), McMurdo Dry Valleys, Ries Crater, Rio Tinto, SP Crater / Black Point Lava Flow (AZ), Svalbard (AMASE / Bockfjord).
 
@@ -48,29 +48,29 @@ Known analogs present in the export: 12 of 12: Atacama Desert (Yungay), Craters 
 | mars_landing | jezero_crater | 0.82 | 0.95 | surface_optics x0.8 |
 | mars_landing | gale_crater | 0.82 | 0.91 | aridity x0.8 |
 | mars_landing | meridiani_planum | 0.82 | 0.95 | surface_optics x0.8 |
-| mars_base | arcadia_planitia | 0.54 | 0.90 | volcanic_caves x0.8 |
+| mars_base | arcadia_planitia | 0.67 | 0.88 | aridity x1.2 |
 | mars_base | arsia_mons_cave_candidate | 0.67 | 0.87 | aridity x1.2 |
 
 ## 4. Target discrimination (same preset, top 10 distinct places)
 
 - moon_landing: 9 targets; mean pairwise Jaccard 1.00; 100% of (cell, characteristic) scores are identical across targets.
-- moon_base: 2 targets; mean pairwise Jaccard 0.00; 54% of (cell, characteristic) scores are identical across targets.
+- moon_base: 2 targets; mean pairwise Jaccard 0.00; 55% of (cell, characteristic) scores are identical across targets.
 - mars_landing: 3 targets; mean pairwise Jaccard 0.43; 66% of (cell, characteristic) scores are identical across targets.
-- mars_base: 2 targets; mean pairwise Jaccard 0.05; 74% of (cell, characteristic) scores are identical across targets.
+- mars_base: 2 targets; mean pairwise Jaccard 0.00; 73% of (cell, characteristic) scores are identical across targets.
 
 ## 5. Environment families in the top 50 (default, first target, 1 degree separation)
 
 - moon_landing: {'polar': 45, 'arid': 36, 'ice sheet': 31, 'desert': 18, 'volcanic': 1, 'cave': 1}; 9 countries/areas.
-- moon_base: {'polar': 48, 'volcanic': 29, 'ice sheet': 26, 'arid': 11, 'desert': 7, 'cave': 6, 'untagged': 1}; 6 countries/areas.
+- moon_base: {'polar': 49, 'volcanic': 26, 'ice sheet': 24, 'arid': 10, 'cave': 5, 'desert': 5, 'untagged': 1}; 8 countries/areas.
 - mars_landing: {'arid': 50, 'desert': 49, 'polar': 9, 'ice sheet': 8, 'volcanic': 1, 'cave': 1}; 14 countries/areas.
-- mars_base: {'polar': 50, 'volcanic': 26, 'arid': 13, 'desert': 8, 'ice sheet': 4, 'cave': 3}; 6 countries/areas.
+- mars_base: {'polar': 50, 'arid': 24, 'volcanic': 18, 'desert': 12, 'ice sheet': 4, 'cave': 3}; 6 countries/areas.
 
 ## 6. Traceability and integrity
 
 - moon_landing: 758 cells; values without units/source 0; scores out of range 0; hard caps 27; null 1%; unnamed region 29.
-- moon_base: 1335 cells; values without units/source 0; scores out of range 0; hard caps 22; null 0%; unnamed region 30.
+- moon_base: 1334 cells; values without units/source 0; scores out of range 0; hard caps 22; null 1%; unnamed region 35.
 - mars_landing: 1087 cells; values without units/source 0; scores out of range 0; hard caps 39; null 1%; unnamed region 18.
-- mars_base: 1180 cells; values without units/source 0; scores out of range 0; hard caps 18; null 0%; unnamed region 21.
+- mars_base: 1182 cells; values without units/source 0; scores out of range 0; hard caps 18; null 1%; unnamed region 45.
 ## 7. Full-population recall (337,611 land cells, 12 known analog sites)
 
 Percentile = share of all land cells that score lower than the best cell of the site. 90+ means top 10%.
