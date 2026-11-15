@@ -5,7 +5,7 @@
  "mission_type": "landing",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:09:52.963989+00:00",
- "analog_summary": "Earth site E_+69.125_+48.875 offers a flat, low‑slope (mean 0.8°) barren plain with a high surface‑optics score (0.978) and moderate illumination (0.66), matching the relatively flat, sun‑lit conditions of the lunar Slater Plain. Its zero ice‑cover fraction, low albedo (0.126) and long polar night (55 days) further emulate lunar polar environment for a landing mission.",
+ "analog_summary": "Earth site E_+69.125_+48.875 offers a flat, low‑slope (mean 0.8°) barren plain with a high surface‑optics score (0.978) and moderate illumination (0.66), matching the relatively flat, sun‑lit conditions of the lunar Slater Plain. Its 0 ice‑cover fraction, low albedo (0.126) and long polar night (55 days) further emulate lunar polar environment for a landing mission.",
  "non_analog_summary": "The site cannot reproduce lunar gravity (1/6 g), vacuum (~10⁻¹⁰ Pa), unfiltered solar and cosmic radiation, extreme temperature range (≈40 K to 400 K), 14‑day day/night cycle, near‑horizon sun at the pole, and electrostatically charged regolith. Thermal similarity is modest (score 0.438) and topographic match is only moderate (score 0.514).",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",

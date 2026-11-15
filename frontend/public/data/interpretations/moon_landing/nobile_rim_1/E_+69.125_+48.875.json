@@ -6,7 +6,7 @@
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:07:19.914372+00:00",
  "analog_summary": "The Nenetskiy Okrug site mirrors the Nobile Rim 1 landing zone through its very high surface‑optics score (near one), moderate illumination conditions, and gentle topography (average slope below one degree). The low mean slope and modest roughness (≈18 m) provide realistic terrain for descent imaging, navigation and hazard detection, supporting a lunar landing mission.",
- "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, intense solar and cosmic radiation, extreme temperature swings, the two‑week day/night cycle, near‑horizon sun geometry, or electrostatically charged regolith. Its thermal similarity is low (score 0.438), and aridity and precipitation differ from the Moon’s airless environment.",
+ "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, intense solar and cosmic radiation, extreme temperature swings, the 2‑week day/night cycle, near‑horizon sun geometry, or electrostatically charged regolith. Its thermal similarity is low (score 0.438), and aridity and precipitation differ from the Moon’s airless environment.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",

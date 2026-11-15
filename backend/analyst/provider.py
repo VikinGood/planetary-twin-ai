@@ -56,7 +56,7 @@ def build_prompt(result: dict) -> str:
         '- "characteristic_highlights": one item per characteristic with a notable score, as '
         '{"characteristic_id": "<name>", "highlight": "<one sentence>"}.\n'
         '- "confidence_note": at most 50 words on missing data, proxies and the confidence level.\n'
-        "Only use numbers that appear in the data. Prefer words over numbers."
+        "Only use numbers that appear in the data, written with digits exactly as in the data (for example 0.72 or -28.6); never spell numbers out in words."
     )
 
 

@@ -5,8 +5,8 @@
  "mission_type": "landing",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:05:18.239777+00:00",
- "analog_summary": "Franz Josef Land’s polar plateau offers gentle mean slopes of about two point four degrees, low roughness, very low albedo and long polar nights, matching the lunar Mons Mouton Plateau’s illumination and topographic conditions for a landing mission.",
- "non_analog_summary": "Earth cannot reproduce lunar one‑sixth gravity, near‑vacuum, intense solar and cosmic radiation, extreme temperature swings, the fourteen‑day day/night cycle, near‑horizon sun at the poles, or electrostatically charged regolith, and its surface optics score is low (0.11).",
+ "analog_summary": "Franz Josef Land’s polar plateau offers gentle mean slopes of about 2.4 degrees, low roughness, very low albedo and long polar nights, matching the lunar Mons Mouton Plateau’s illumination and topographic conditions for a landing mission.",
+ "non_analog_summary": "Earth cannot reproduce lunar 1/6 gravity, near‑vacuum, intense solar and cosmic radiation, extreme temperature swings, the 14‑day day/night cycle, near‑horizon sun at the poles, or electrostatically charged regolith, and its surface optics score is low (0.11).",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",
@@ -25,7 +25,7 @@
   },
   {
    "characteristic_id": "Thermal",
-   "highlight": "Score of 0.729 aligns with the cold annual mean temperature of about minus thirteen point two degrees Celsius."
+   "highlight": "Score of 0.729 aligns with the cold annual mean temperature of about -13.2 degrees Celsius."
   },
   {
    "characteristic_id": "Illumination",

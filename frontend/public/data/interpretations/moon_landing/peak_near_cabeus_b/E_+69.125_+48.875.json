@@ -6,7 +6,7 @@
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:01:47.391817+00:00",
  "analog_summary": "The Nenetskiy Okrug site mirrors the south‑polar peak target for a lunar landing because its surface optics score is near perfect (0.978), indicating similar albedo and reflectance, and its illumination score (0.66) reflects comparable low‑sun angles. Moderate topographic similarity (0.514) and gentle slopes (mean 0.8°) reproduce the gentle terrain expected at the peak, supporting descent imaging and navigation.",
- "non_analog_summary": "The site scores low for thermal similarity (0.438), so lunar temperature extremes are not reproduced. Earth cannot mimic the Moon’s one‑sixth gravity, ultra‑high vacuum, unfiltered solar and cosmic radiation, temperature range from about forty kelvin to four hundred kelvin, fourteen‑day day/night cycle, near‑horizon sun at the pole, and electrostatically charged sharp‑edged regolith.",
+ "non_analog_summary": "The site scores low for thermal similarity (0.438), so lunar temperature extremes are not reproduced. Earth cannot mimic the Moon’s 1/6 gravity, ultra‑high vacuum, unfiltered solar and cosmic radiation, temperature range from about 40 kelvin to 400 kelvin, 14‑day day/night cycle, near‑horizon sun at the pole, and electrostatically charged sharp‑edged regolith.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",
@@ -25,7 +25,7 @@
   },
   {
    "characteristic_id": "Thermal",
-   "highlight": "Thermal scores 0.438, the lowest of the four, indicating limited temperature analog."
+   "highlight": "Thermal scores 0.438, the lowest of the 4, indicating limited temperature analog."
   },
   {
    "characteristic_id": "Illumination",

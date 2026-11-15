@@ -36,7 +36,7 @@ with lyrics. Upload to YouTube as Public or Unlisted and test the link logged ou
    and others (logos not allowed: use names only).
 6. **A new candidate.** One characterization card: what it reproduces, what it cannot, which
    activities it supports; landing versus base comparison.
-7. **Results and next steps.** Validation numbers [TO CONFIRM], limits, future work: finer
+7. **Results and next steps.** Validation: McMurdo, Svalbard and Devon Island in the top 3–8% of all land for a lunar base, found without being told; limits, future work: finer
    grid, field checks with partners, more targets.
 
 ## 3. Live demo for the local jury: 2 minutes
@@ -47,8 +47,8 @@ with lyrics. Upload to YouTube as Public or Unlisted and test the link logged ou
 3. (25 s) Add "Ice and Polar" and remove "Surface Optics": the ranking changes live.
 4. (25 s) Compare both: landing and base side by side; point at a site that ranks in both.
 5. (15 s) Switch to Mars, Permanent base, Arcadia Planitia: different places come up.
-6. (10 s) Turn off "Exclude known analogs": the validation badge shows how many known analogs
-   the engine recovers.
+6. (10 s) Point at the validation badge: known analog sites (McMurdo, Svalbard, Lanzarote)
+   rank in the top few percent of all 337,611 land cells, found without being told.
 
 Backup: if the network fails, run `yarn preview` in `frontend/` on the laptop; the data is
 local.

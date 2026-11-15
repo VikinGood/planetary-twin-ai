@@ -5,7 +5,7 @@
  "mission_type": "landing",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:09:39.877652+00:00",
- "analog_summary": "E_+80.625_+46.875 in Franz Josef Land offers a barren, low‑albedo polar plain with mean slopes of about two degrees and roughness around twenty‑three metres, matching the gentle, rocky rim of de Gerlache crater. Its long polar night (≈135 days) and high illumination similarity (score 0.842) provide realistic lighting for landing‑site imaging and navigation.",
+ "analog_summary": "E_+80.625_+46.875 in Franz Josef Land offers a barren, low‑albedo polar plain with mean slopes of about 2 degrees and roughness around 23 metres, matching the gentle, rocky rim of de Gerlache crater. Its long polar night (≈135 days) and high illumination similarity (score 0.842) provide realistic lighting for landing‑site imaging and navigation.",
  "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, unfiltered solar and cosmic radiation, extreme temperature swings from ~40 K to 400 K, the 14‑day day/night cycle, near‑horizon sun geometry, or electrostatically charged regolith. Surface‑optics similarity is low (score 0.11).",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
@@ -25,7 +25,7 @@
   },
   {
    "characteristic_id": "Thermal",
-   "highlight": "Thermal similarity is moderate, with an annual mean temperature of about minus thirteen degrees Celsius."
+   "highlight": "Thermal similarity is moderate, with an annual mean temperature of about -13 degrees Celsius."
   },
   {
    "characteristic_id": "Illumination",

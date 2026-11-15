@@ -5,8 +5,8 @@
  "mission_type": "landing",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:02:54.287701+00:00",
- "analog_summary": "The Franz Josef Land site matches the Haworth crater target for a lunar landing because its gentle mean slope of about two degrees, low roughness, high illumination score, and thermal conditions similar to lunar polar environments make it suitable for descent imaging, navigation and hazard avoidance.",
- "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, intense solar and cosmic radiation, extreme temperature swings, the fourteen‑day day/night cycle, the near‑horizon sun at the pole, or the electrostatically charged regolith, limiting its fidelity for plume‑surface interaction and surface mobility testing.",
+ "analog_summary": "The Franz Josef Land site matches the Haworth crater target for a lunar landing because its gentle mean slope of about 2 degrees, low roughness, high illumination score, and thermal conditions similar to lunar polar environments make it suitable for descent imaging, navigation and hazard avoidance.",
+ "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, intense solar and cosmic radiation, extreme temperature swings, the 14‑day day/night cycle, the near‑horizon sun at the pole, or the electrostatically charged regolith, limiting its fidelity for plume‑surface interaction and surface mobility testing.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",

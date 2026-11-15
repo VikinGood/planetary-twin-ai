@@ -5,7 +5,7 @@
  "mission_type": "landing",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:01:59.479551+00:00",
- "analog_summary": "The Canarias desert site offers low barren fraction, gentle slopes (average two point six degrees) and moderate roughness (about twenty‑six meters), matching the modest topography of the Cabeus B peak. Its dark surface (albedo zero point zero eight five) and arid climate replicate lunar surface optics, supporting landing and navigation tests.",
+ "analog_summary": "The Canarias desert site offers low barren fraction, gentle slopes (average 2.6 degrees) and moderate roughness (about 26 meters), matching the modest topography of the Cabeus B peak. Its dark surface (albedo 0.085) and arid climate replicate lunar surface optics, supporting landing and navigation tests.",
  "non_analog_summary": "Earth cannot mimic lunar gravity, vacuum, extreme temperature range, 14‑day cycle, near‑horizon sun, or electrostatically charged regolith. The site’s illumination score is low (0.275) and thermal similarity modest (0.356), limiting replication of polar night and thermal conditions.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",

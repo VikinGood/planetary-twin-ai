@@ -6,7 +6,7 @@
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:07:30.437342+00:00",
  "analog_summary": "The site’s desert terrain, very low mean slope of about 2.6°, and moderate roughness of roughly 26 m give a topographic score of 0.809, matching the rugged rim of Nobile crater. Its low broadband albedo of 0.085 yields a surface‑optics score of 0.84, closely resembling lunar regolith reflectance, making it a strong analog for a landing mission.",
- "non_analog_summary": "Earth cannot reproduce lunar gravity, vacuum, high‑energy radiation, extreme temperature range, the two‑week day/night cycle, near‑horizon sun at the poles, or electrostatically charged regolith. The lowest scores are illumination (0.275) and thermal (0.356), reflecting limited similarity to the Moon’s lighting and temperature environment.",
+ "non_analog_summary": "Earth cannot reproduce lunar gravity, vacuum, high‑energy radiation, extreme temperature range, the 2‑week day/night cycle, near‑horizon sun at the poles, or electrostatically charged regolith. The lowest scores are illumination (0.275) and thermal (0.356), reflecting limited similarity to the Moon’s lighting and temperature environment.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",

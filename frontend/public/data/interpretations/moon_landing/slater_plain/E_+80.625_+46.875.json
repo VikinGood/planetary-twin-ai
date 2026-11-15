@@ -5,8 +5,8 @@
  "mission_type": "landing",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:10:40.740733+00:00",
- "analog_summary": "The Franz Josef Land site is a barren, flat polar plain with a mean slope of about two-point-four degrees and low roughness, matching the relatively flat Slater Plain. Its very low albedo (0.01) and long polar night of roughly one-hundred-thirty-five days reproduce lunar illumination conditions, while the high topographic and illumination scores confirm its suitability for landing studies.",
- "non_analog_summary": "The site cannot replicate lunar gravity, vacuum, unfiltered solar and cosmic radiation, extreme temperature range, the fourteen-day day/night cycle, the near-horizon sun at the pole, or the electrostatically charged sharp-edged regolith.",
+ "analog_summary": "The Franz Josef Land site is a barren, flat polar plain with a mean slope of about 2.4 degrees and low roughness, matching the relatively flat Slater Plain. Its very low albedo (0.01) and long polar night of roughly 135 days reproduce lunar illumination conditions, while the high topographic and illumination scores confirm its suitability for landing studies.",
+ "non_analog_summary": "The site cannot replicate lunar gravity, vacuum, unfiltered solar and cosmic radiation, extreme temperature range, the 14-day day/night cycle, the near-horizon sun at the pole, or the electrostatically charged sharp-edged regolith.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",
@@ -26,7 +26,7 @@
   },
   {
    "characteristic_id": "Thermal",
-   "highlight": "Thermal score 0.729 aligns with the cold annual mean temperature of about minus thirteen degrees Celsius."
+   "highlight": "Thermal score 0.729 aligns with the cold annual mean temperature of about -13 degrees Celsius."
   },
   {
    "characteristic_id": "Illumination",

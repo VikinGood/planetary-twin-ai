@@ -36,7 +36,7 @@ reasoning so mission planners can trust or challenge each result.
 
 ## Link to Final Project
 
-- Live tool: [TO CONFIRM: https://vikingood.github.io/planetary-twin-ai/]
+- Live tool: https://vikingood.github.io/planetary-twin-ai/
 - Code: https://github.com/VikinGood/planetary-twin-ai
 
 ## Detailed Project Description
@@ -66,19 +66,25 @@ base), and the conditions Earth cannot reproduce.
   context, ice and permafrost, and the solar illumination regime computed from orbital
   geometry. Heavy processing runs in Google Earth Engine; the tool only loads small,
   precomputed tables.
-- Moon and Mars: reference values for each target come from NASA mission products (LOLA,
-  Diviner, LROC, MOLA, TES and others) [TO CONFIRM: say "compiled from published products"
-  if the values were not extracted directly from the data].
+- Moon and Mars: reference values for each target are compiled from published NASA
+  mission products and peer-reviewed papers (LOLA, Diviner, LROC, MOLA, TES, SWIM and
+  others), each with its citation and a coordinate-status flag.
 - Scoring: each characteristic follows an explicit rule (absolute comparison, requirement,
   percentile regime or category), documented in `docs/METHODOLOGY.md`. Selected
   characteristics combine with a weighted geometric mean, so a site that fails one
   requirement cannot hide behind good scores elsewhere. Every score breaks down by
   characteristic and carries a confidence level.
-- Validation: the engine is run without excluding known analogs to check how many it
-  recovers in its top results [TO CONFIRM: numbers from docs/VALIDATION.md].
+- Bare surfaces only: candidates must be at least 50% barren, snow/ice or open shrubland
+  (MODIS MCD12Q1), so dark forests are never mistaken for lunar regolith.
+- Validation (`docs/VALIDATION_REPORT.md`): we scored all 337,611 land cells and checked where
+  12 well-known analog sites fall, without telling the engine about them. For a lunar
+  south-pole base, the McMurdo Dry Valleys, Svalbard and Devon Island (Haughton Crater) rank
+  in the top 3%, 6% and 8% of all land on Earth; for a Mars landing, Lanzarote ranks in the
+  top 5–9% and Rio Tinto in the top 9–19%. Landing and base rankings share no place in their
+  top 10, and the top 10 stays stable when any weight changes by ±20%.
 - AI interpretation: a language model writes a short, labeled explanation for top
   candidates using only the numbers in the result; a deterministic checker rejects any
-  invented number [TO CONFIRM: delete if Phase 4 was not finished].
+  invented number.
 
 **Benefits.** Analog campaigns are expensive and usually return to the same few sites. A
 transparent, global search helps mission teams find closer, cheaper or more specific test
@@ -93,8 +99,8 @@ Artificial Intelligence".
 - MODIS MOD11A2 Land Surface Temperature (NASA LP DAAC): day and night temperature,
   annual range and diurnal range for every Earth cell (thermal characteristic).
 - MODIS MCD43A3 albedo (NASA LP DAAC): broadband albedo for every Earth cell (surface optics).
-- MODIS MCD12Q1 land cover (NASA LP DAAC): snow and ice cover (ice and polar)
-  [TO CONFIRM it was used in the final run].
+- MODIS MCD12Q1 land cover (NASA LP DAAC): land mask, snow and ice cover, and the
+  bare-surface filter (barren, snow/ice and open shrubland classes).
 - LRO LOLA, LRO Diviner and LROC products (NASA PDS, LROC/ASU): lunar topography,
   temperatures, illumination, permanently shadowed regions and the Lunar Pit Atlas, used for
   the Moon reference targets.
@@ -104,23 +110,24 @@ Artificial Intelligence".
   Planitia.
 - NASA's candidate south-polar landing regions (release 24-136, October 28, 2024): Moon
   landing targets.
-- NASA Astrobiology field sites and the USGS Known Terrestrial Analog Sites: known analogs
-  for validation.
+- NASA analog field programs (Haughton-Mars Project, ARADS in the Atacama, Desert RATS):
+  part of the 12 known analog sites used for validation (`data/reference/known_analogs.csv`).
 
 ## Space Agency Partner & Other Data
 
 - Copernicus DEM GLO-30 (ESA / Copernicus programme): Earth topography.
-- ESA Catalogue of Planetary Analogues: known analogs for validation.
+- ESA PANGAEA (Lanzarote) and the Ries crater training sites: known analogs for validation.
+- FAO GAUL 2015 administrative boundaries: region names for candidates.
 - TerraClimate (University of Idaho): aridity (precipitation over potential evapotranspiration).
 - GLiM Global Lithological Map (Hartmann and Moosdorf 2012, PANGAEA): Earth lithology
-  [TO CONFIRM it was used].
+
 - Smithsonian Global Volcanism Program, Holocene volcanoes: volcanic recency for the lava-tube
-  proxy [TO CONFIRM it was used].
-- IPA Global Permafrost Zonation Index (Gruber 2012): permafrost [TO CONFIRM it was used].
+  proxy.
+- IPA Global Permafrost Zonation Index (Gruber 2012): permafrost.
 - USGS Unified Geologic Map of the Moon, USGS Global Geologic Map of Mars (Tanaka et al.
   2014) and the Mars Global Cave Candidate Catalog (MGC³): geology and cave references.
-- Mars Climate Database (LMD/CNRS/ESA, non-commercial license): Mars temperatures
-  [TO CONFIRM it was used].
+- Mars Climate Database (LMD/CNRS/ESA): published temperature values cited for the Mars
+  reference targets.
 - OpenStreetMap (© OpenStreetMap contributors): base map tiles.
 - Open-source software: React, MapLibre GL JS, Vite, FastAPI, NumPy, pandas, GeoPandas,
   Rasterio, Earth Engine Python API.
@@ -137,13 +144,11 @@ team, and the scoring rules, targets and results were checked against their sour
   scoring engine.
 - Claude (Anthropic): review of methodology and data, the Explorer dashboard code, and drafts
   of the submission texts.
-- [TO CONFIRM: ChatGPT or other assistants used for early brainstorming.]
 - [TO CONFIRM: Groq-hosted LLM that writes the per-candidate interpretations, labeled
   "AI interpretation" in the tool.]
 
 AI-generated code carries a header comment saying so, and the README has a "Use of
-Artificial Intelligence" section. No AI-generated images or video are used
-[TO CONFIRM; if any are, they must carry a visible watermark]. No NASA logos or mission
+Artificial Intelligence" section. No AI-generated images or video are used. No NASA logos or mission
 insignia appear in the project.
 
 ## References
@@ -163,8 +168,13 @@ insignia appear in the project.
 - Putzig, N. E. and Mellon, M. T. (2007). Apparent thermal inertia and the surface
   heterogeneity of Mars.
 - Abatzoglou, J. T. et al. (2018). TerraClimate.
-- Bernard et al. (2020). ESA Catalogue of Planetary Analogues.
-- [TO CONFIRM: complete with every source cited in docs/DATASETS.md and docs/METHODOLOGY.md.]
+- Morgan, G. A. et al. (2021). Availability of subsurface water-ice resources in the northern
+  mid-latitudes of Mars (SWIM). Nature Astronomy.
+- Copernicus DEM GLO-30, ESA / Airbus (2021, release 2024_1).
+- Wan, Z. et al. MODIS MOD11A2 v061; Schaaf, C. and Wang, Z. MCD43A3 v061; Friedl, M. and
+  Sulla-Menashe, D. MCD12Q1 v061 (NASA LP DAAC).
+- Global Volcanism Program (2024). Volcanoes of the World, Smithsonian Institution.
+- Full list with licenses: `docs/DATASETS.md` and `docs/DATA_SOURCES.md` in the repository.
 
 ---
 

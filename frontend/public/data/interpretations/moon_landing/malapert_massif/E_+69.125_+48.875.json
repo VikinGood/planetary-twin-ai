@@ -6,7 +6,7 @@
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:03:07.918819+00:00",
  "analog_summary": "The Nenetskiy Okrug site mirrors the Malapert Massif landing environment through its extremely low slope (average less than one degree), very smooth surface (roughness ~18 m), high barren fraction, and near‑continuous illumination (55‑day polar night, illumination score 0.66). Its dark, low‑albedo ground (0.126) and sparse vegetation provide surface‑optics similarity (score 0.978), supporting landing‑site navigation.",
- "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, high‑energy radiation, extreme temperature swings (40 K to 400 K), the two‑week lunar day/night cycle, near‑horizon sun geometry, or electrostatically charged regolith. Thermal similarity is modest (score 0.438), limiting heat‑transfer analogs.",
+ "non_analog_summary": "The site cannot reproduce lunar gravity, vacuum, high‑energy radiation, extreme temperature swings (40 K to 400 K), the 2‑week lunar day/night cycle, near‑horizon sun geometry, or electrostatically charged regolith. Thermal similarity is modest (score 0.438), limiting heat‑transfer analogs.",
  "testable_activities": [
   "descent imaging and terrain-relative navigation",
   "hazard detection and avoidance",

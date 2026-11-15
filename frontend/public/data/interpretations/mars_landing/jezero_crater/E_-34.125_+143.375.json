@@ -29,7 +29,7 @@
   },
   {
    "characteristic_id": "Thermal",
-   "highlight": "Thermal scores 0.363, the lowest of the four, showing limited similarity in temperature regimes."
+   "highlight": "Thermal scores 0.363, the lowest of the 4, showing limited similarity in temperature regimes."
   }
  ]
 }

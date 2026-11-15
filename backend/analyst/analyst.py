@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import math
 
-from backend.analyst.checker import invented_numbers
+from backend.analyst.checker import invented_numbers, words_to_digits
 from backend.analyst.schema import validate_interpretation
 from backend.llm_provider import AI_DISCLOSURE, LLMProvider, NoLLMProvider
 
@@ -126,17 +126,17 @@ def clean(interp: dict, result: dict) -> dict:
         "mission_type": result["mission_type"],
         "model": str(interp.get("model", "unknown")),
         "generated_at": str(interp.get("generated_at", "")),
-        "analog_summary": str(interp.get("analog_summary", "")).strip(),
-        "non_analog_summary": str(interp.get("non_analog_summary", "")).strip(),
+        "analog_summary": words_to_digits(str(interp.get("analog_summary", "")).strip()),
+        "non_analog_summary": words_to_digits(str(interp.get("non_analog_summary", "")).strip()),
         "testable_activities": [str(a).strip() for a in (interp.get("testable_activities") or []) if str(a).strip()][:8],
-        "confidence_note": str(interp.get("confidence_note", "")).strip(),
+        "confidence_note": words_to_digits(str(interp.get("confidence_note", "")).strip()),
         "ai_disclosure": AI_DISCLOSURE,
     }
     hl = interp.get("characteristic_highlights")
     if isinstance(hl, list):
         hl = [h for h in hl if isinstance(h, dict) and h.get("characteristic_id") and h.get("highlight")]
         if hl:
-            out["characteristic_highlights"] = [{"characteristic_id": str(h["characteristic_id"]), "highlight": str(h["highlight"])[:200]} for h in hl]
+            out["characteristic_highlights"] = [{"characteristic_id": str(h["characteristic_id"]), "highlight": words_to_digits(str(h["highlight"]))[:200]} for h in hl]
     note = out["confidence_note"]
     if DEFAULT_SELECTION_NOTE not in note:
         note = (note + " " + DEFAULT_SELECTION_NOTE).strip()

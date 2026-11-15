@@ -130,3 +130,12 @@ def test_prompt_contains_rules_and_data():
     prompt = build_prompt(result())
     assert "Only use numbers that appear in the data" in prompt
     assert "Malapert Massif" in prompt and "hazard detection and avoidance" in prompt
+
+
+def test_spelled_numbers_are_converted_and_checked():
+    from backend.analyst.checker import words_to_digits
+    assert words_to_digits("minus twenty‑eight point six degrees") == "-28.6 degrees"
+    assert words_to_digits("a fourteen-day cycle, one of the sites") == "a 14-day cycle, one of the sites"
+    r = result()
+    bad = clean(good_answer(analog_summary="Thermal reaches ninety-nine point nine percent."), r)
+    assert invented_numbers(bad, r) == [99.9]

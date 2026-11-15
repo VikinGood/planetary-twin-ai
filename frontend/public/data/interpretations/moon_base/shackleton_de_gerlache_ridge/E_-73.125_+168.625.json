@@ -5,8 +5,8 @@
  "mission_type": "base",
  "model": "openai/gpt-oss-120b",
  "generated_at": "2026-11-15T13:10:53.250491+00:00",
- "analog_summary": "The Antarctic ridge at cell E_-73.125_+168.625 mirrors Shackleton–de Gerlache Ridge for a lunar base because it exhibits high ice and polar relevance (score 0.8) with 0.38 ice cover, long polar night of eighty‑nine days, strong illumination conditions (score 0.721) and low mean slope of two‑point‑six degrees, supporting thermal stability (score 0.717) and manageable topography (score 0.676).",
- "non_analog_summary": "The site scores only moderate for volcanic terrain and caves (0.5) and geology (0.5), so it cannot fully represent lunar lava‑tube environments. Earth cannot reproduce lunar gravity, vacuum, unfiltered solar and cosmic radiation, extreme temperature range, fourteen‑day day/night cycle, near‑horizon sun geometry, and electrostatically charged regolith.",
+ "analog_summary": "The Antarctic ridge at cell E_-73.125_+168.625 mirrors Shackleton–de Gerlache Ridge for a lunar base because it exhibits high ice and polar relevance (score 0.8) with 0.38 ice cover, long polar night of 89 days, strong illumination conditions (score 0.721) and low mean slope of 2.6 degrees, supporting thermal stability (score 0.717) and manageable topography (score 0.676).",
+ "non_analog_summary": "The site scores only moderate for volcanic terrain and caves (0.5) and geology (0.5), so it cannot fully represent lunar lava‑tube environments. Earth cannot reproduce lunar gravity, vacuum, unfiltered solar and cosmic radiation, extreme temperature range, 14‑day day/night cycle, near‑horizon sun geometry, and electrostatically charged regolith.",
  "testable_activities": [
   "habitat construction and site preparation",
   "ISRU water extraction from ground ice",
@@ -30,11 +30,11 @@
   },
   {
    "characteristic_id": "Thermal",
-   "highlight": "Thermal scores 0.717, consistent with an annual mean temperature of minus twenty‑eight point six degrees Celsius."
+   "highlight": "Thermal scores 0.717, consistent with an annual mean temperature of -28.6 degrees Celsius."
   },
   {
    "characteristic_id": "Topography",
-   "highlight": "Topography scores 0.676, with a gentle mean slope of two‑point‑six degrees."
+   "highlight": "Topography scores 0.676, with a gentle mean slope of 2.6 degrees."
   },
   {
    "characteristic_id": "Geology",
