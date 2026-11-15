@@ -19,6 +19,11 @@ Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
 
+- 2026-11-15 (GitHub Pages deployment & CI):
+  - Updated `.github/workflows/pages.yml` to `node-version: 22` to satisfy dependencies.
+  - GitHub Actions build and deployment succeeded.
+  - Live deployment verified at `https://vikingood.github.io/planetary-twin-ai/`: interactive map rendered with numbered pins and top 10 analog ranking table fully populated.
+
 - 2026-11-15 (Phase 6 validation & open items resolution):
   - Verified and updated all 12 `source_url` entries in `data/reference/known_analogs.csv` to active HTTP 200 URLs.
   - Spot-checked Franz Josef Land coordinates (`E_+80.625_+46.875`), correctly labeled `Franz Josef Land, Russian Federation`.
