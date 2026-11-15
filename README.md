@@ -1,4 +1,6 @@
-# Planetary Twin AI
+# Celestial Analog Finder (Space Logistics)
+
+*Discover Earth. Prepare for other worlds.* Formerly "Planetary Twin AI" (repository name).
 
 Space Logistics team, NASA Space Apps Challenge 2026.
 

@@ -32,4 +32,6 @@ logs/
 # Large media
 docs/*.mp4
 *.mp4
+docs/*.mp3
+*.mp3
 

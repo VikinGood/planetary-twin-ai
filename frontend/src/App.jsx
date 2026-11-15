@@ -135,7 +135,7 @@ export default function App() {
       )}
       <header className="topbar">
         <div>
-          <h1>Space Logistics - Planetary Twin AI</h1>
+          <h1>Celestial Analog Finder - Planetary Twin AI</h1>
           <p className="muted">New Earth analogs for Moon and Mars landing sites and permanent bases</p>
         </div>
         <div className="segmented" role="group" aria-label="Planetary body">

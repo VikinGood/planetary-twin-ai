@@ -12,11 +12,13 @@ Susana Cardozo.
 
 ## Project Name
 
-Planetary Twin AI
+Celestial Analog Finder
+
+Tagline: Discover Earth. Prepare for other worlds.
 
 ## High-Level Project Summary
 
-Planetary Twin AI is an interactive map that finds and characterizes new places on Earth
+Celestial Analog Finder, by team Space Logistics, is an interactive map that finds and characterizes new places on Earth
 where teams can rehearse future Moon and Mars missions. The user picks a body (Moon or
 Mars), a mission type (landing site or permanent base) and any combination of eight
 characteristics: topography, geology, thermal environment, aridity, ice and polar
@@ -41,7 +43,7 @@ reasoning so mission planners can trust or challenge each result.
 
 ## Detailed Project Description
 
-**What it does.** Planetary Twin AI turns the analog search into a mission question: "Where
+**What it does.** Celestial Analog Finder turns the analog search into a mission question: "Where
 on Earth can we test this landing or this base before we fly?" The user chooses:
 
 1. the body: Moon or Mars;
