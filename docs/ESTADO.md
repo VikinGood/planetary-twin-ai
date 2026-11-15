@@ -9,15 +9,38 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | 0 Setup | 00-kickoff-orchestrator.md | Space Apps Orchestrator | approved | Guillermo | |
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
 | 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
-| 3 Backend core | 03-backend.md | Agent | approved | | Earth pipeline, land mask, targets, scoring engine, API complete |
+| 3 Backend core | 03-backend.md | Agent | approved | | Earth pipeline (1km slope, aridity, ice_polar, GLiM, GVP), targets, scoring engine, API complete |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
-| 5 Explorer dashboard | 05-frontend.md | Agent | pending | | parallel with 3 and 4 |
+| 5 Explorer dashboard | 05-frontend.md | Agent | review | | Static export <3MB, Vite build & Yarn tests passing, no MOCK banner, Pages CI in place |
 | 6 Validation | 06-validation.md | Science Reviewer + Agent | pending | | |
 | 7 Submission package | 07-submission.md | Agent | pending | | |
 
 Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
+
+- 2026-11-15 (Phase 3 fixes and Phase 5 static export):
+  - Slope recalculated on Copernicus DEM GLO-30 reprojected to 1 km baseline before reducing
+    mean and std to the 0.25° grid across 386 10°×10° land tiles with local caching. Global max
+    slope rose from 5.07° to 25.77°; Everest 18.54° (relief 4318.9 m), Aconcagua 15.81° (relief 3567.7 m),
+    Amazon 0.82° (relief 86.5 m).
+  - Ground ice score updated to `ground_ice_score = permafrost_index`. Permanent ice sheets
+    (`ice_cover_fraction >= 0.5`) capped at score 0.5 and tagged `"ice sheet"`. Devon Island awarded
+    full permafrost index (0.80).
+  - Aridity updated to dual rule `aridity_score = max(1 - min(P/PET, 1), 1 - min(P / 250 mm, 1))`.
+    Zeroing for permanent ice removed. Polar deserts (Antarctic plateau 0.71, Devon Island 0.18)
+    properly scored as arid analogs.
+  - Volcano qualifying types: removed `"Lava dome(s)"`, retaining only low-viscosity basaltic systems.
+  - Real GLiM 0.5° lithology (PANGAEA) ingested: 332,998 valid cells (98.6% coverage), 9,490 basic volcanic (`vb`).
+  - Smithsonian GVP Holocene volcano catalog (1,215 volcanoes, 303 qualifying) ingested: 754 HIGH
+    and 14,184 MEDIUM likelihood lava-tube cells identified globally.
+  - All 64 scoring and API unit tests passing (1.61 s).
+  - Static export `scripts/export_static.py` vectorized with NumPy across 337,611 cells. Generates
+    `meta.json` (`"mock": false`), and all 4 preset GeoJSONs (`moon_landing.json`: 1.37 MB / 480 feats;
+    `moon_base.json`: 2.81 MB / 1,529 feats; `mars_landing.json`: 2.60 MB / 1,397 feats;
+    `mars_base.json`: 2.96 MB / 1,632 feats), all strictly under 3.0 MB.
+  - Frontend production build verified (`yarn build` in 3.61 s; `yarn test` 9/9 passing; no MOCK banner).
+  - GitHub Pages deploy workflow added (`.github/workflows/pages.yml`).
 
 - 2026-11-15 (Phase 3 Earth data & targets):
   - Land mask computed from MODIS MCD12Q1 (classes 1–16 = land, 17 = water) with bilinear resampling;
@@ -108,18 +131,20 @@ Status values: pending, in progress, review, approved, blocked.
 - `backend/llm_provider.py`: ✅ Phase 3c.
 - `backend/main.py`: ✅ Phase 3c.
 - `backend/routers/` (6 routers): ✅ Phase 3c.
-- `backend/tests/test_scoring.py` (36 unit tests): ✅ Phase 3c.
-- `backend/tests/test_api.py` (15 API tests): ✅ Phase 3c.
-- `scripts/export_static.py`: ✅ Phase 3c.
+- `backend/tests/test_scoring.py`: ✅ Phase 3c & 3 fixes (64 unit & scoring tests passing).
+- `backend/tests/test_api.py`: ✅ Phase 3c (15 API tests).
+- `scripts/export_static.py`: ✅ Phase 3c & 5 (vectorized NumPy export, files under 3 MB).
 - `backend/README.md`: ✅ Phase 3c.
-- `data/processed/earth_illumination_025deg.parquet`: ✅ produced (pure computation, 1,036,800 cells).
-- `data/processed/earth_cells_025deg.parquet`: ✅ partial (illumination only; 7 chars pending raw data).
+- `data/processed/earth_cells_025deg.parquet`: ✅ complete (337,611 land cells, 67 columns, all 8 characteristics, 0 nulls).
 - `scripts/planets/01_moon_references.py`: ✅ Phase 3b — 11 Moon targets (9 landing + 2 base); literature values, all UNVERIFIED.
 - `scripts/planets/02_mars_references.py`: ✅ Phase 3b — 5 Mars targets (3 landing + 2 base); literature values, all UNVERIFIED.
-- `scripts/planets/00_assemble_targets.py`: ✅ Phase 3b — merges both; computes illumination percentiles from Earth parquet (real); thermal percentiles APPROXIMATE (Earth parquet lacks thermal columns yet).
+- `scripts/planets/00_assemble_targets.py`: ✅ Phase 3b — merges both; computes percentiles against 337,611 Earth cells.
 - `data/processed/moon_targets_raw.json`: ✅ produced.
 - `data/processed/mars_targets_raw.json`: ✅ produced.
-- `data/processed/targets.json`: ✅ produced — 16 targets; illumination percentiles computed from 1,036,800 Earth cells; thermal percentiles labeled APPROXIMATE until Earth thermal pipeline runs.
+- `data/processed/targets.json`: ✅ produced — 16 targets with empirical Earth percentiles.
+- `frontend/public/data/` (`meta.json` + 4 presets): ✅ Phase 5 static exports (< 3 MB each, mock: false).
+- `.github/workflows/pages.yml`: ✅ Phase 5 GitHub Pages deployment workflow.
+- `docs/reviews/handoff-phase-3-fixes.md`: ✅ Phase 3 fixes and Phase 5 export handoff.
 
 ## Open questions for the team
 

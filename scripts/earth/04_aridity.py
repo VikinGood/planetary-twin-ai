@@ -87,8 +87,11 @@ def main():
     # Compute aridity_index = pr / pet (capped at 2.0 per methodology §2.4)
     merged["aridity_index"] = (merged["precipitation"] / merged["pet"]).clip(0.0, 2.0)
     
-    # Requirement scoring formula: 1 - min(aridity_index, 1)
-    merged["aridity_score"] = 1.0 - merged["aridity_index"].clip(0.0, 1.0)
+    # Requirement scoring formula: max(1 - min(P/PET, 1), 1 - min(P / 250 mm, 1))
+    # so polar deserts with under 250 mm/yr score as arid
+    p_pet_term = 1.0 - (merged["precipitation"] / merged["pet"]).clip(0.0, 1.0)
+    pr_250_term = 1.0 - (merged["precipitation"] / 250.0).clip(0.0, 1.0)
+    merged["aridity_score"] = np.maximum(p_pet_term, pr_250_term)
     
     merged["aridity_confidence"] = "high"
     merged["aridity_proxy"] = False

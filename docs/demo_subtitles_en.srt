@@ -1,0 +1,33 @@
+1
+00:00:00,000 --> 00:00:02,000
+We are Space Logistics, from Buenos Aires.
+
+2
+00:00:02,000 --> 00:00:05,000
+Before we land on the Moon or Mars,
+we must test everything on Earth.
+
+3
+00:00:05,000 --> 00:00:10,000
+This is Planetary Twin AI:
+finding the Moon and Mars on Earth.
+
+4
+00:00:10,000 --> 00:00:15,000
+Pick a world and a mission:
+a landing site or a permanent base.
+
+5
+00:00:15,000 --> 00:00:20,000
+Choose what matters.
+NASA data scores every place on Earth.
+
+6
+00:00:20,000 --> 00:00:25,000
+It finds new analogs, and says what they test
+and what Earth cannot reproduce.
+
+7
+00:00:25,000 --> 00:00:30,000
+Cheaper, closer test sites
+for the next steps in space.

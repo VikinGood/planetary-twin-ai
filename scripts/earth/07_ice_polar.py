@@ -69,8 +69,7 @@ def main():
     lat_mult = np.where(abs_lat > 55.0, 1.0, np.where(abs_lat >= 23.5, 0.5, 0.0))
     merged["latitude_multiplier"] = lat_mult
     
-    # Permafrost index: 1.0 where ice cover exists; high-latitude proxy 0.8 where |lat| > 60
-    # pending offline PANGAEA IPA GZI GeoTIFF
+    # Permafrost index: high-latitude proxy pending offline PANGAEA IPA GZI GeoTIFF
     permafrost = np.where(
         merged["ice_cover_fraction"] >= 0.5,
         1.0,
@@ -78,12 +77,17 @@ def main():
     )
     merged["permafrost_index"] = permafrost
     
-    permafrost_score = merged["permafrost_index"] * merged["latitude_multiplier"]
-    merged["ice_polar_score"] = np.sqrt(permafrost_score * merged["ice_cover_fraction"])
+    # Ground-ice score: permafrost_index; permanent ice sheets (fraction >= 0.5) score 0.5
+    # (glacier ice is not ice-cemented regolith)
+    merged["ice_polar_score"] = np.where(
+        merged["ice_cover_fraction"] >= 0.5,
+        0.5,
+        merged["permafrost_index"]
+    )
     
     merged["ice_polar_confidence"] = "medium"
     merged["ice_polar_proxy"] = True  # EE ice is real; permafrost uses high-lat proxy
-    merged["ice_polar_source"] = f"{SOURCE} class 15; latitude proxy for permafrost; processed {PROC_DATE}"
+    merged["ice_polar_source"] = f"{SOURCE} class 15; latitude proxy for permafrost; ground-ice rule (ice sheet=0.5); processed {PROC_DATE}"
     
     cols = [
         "cell_id", "lat_center", "lon_center",

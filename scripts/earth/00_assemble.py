@@ -109,6 +109,11 @@ def build_env_tags(row: pd.Series) -> list[str]:
     if abs(row["lat_center"]) > 60.0:
         tags.append("polar")
 
+    # ice sheet (permanent glacier ice)
+    ice_cover = row.get("ice_cover_fraction", np.nan)
+    if not pd.isna(ice_cover) and ice_cover >= 0.5:
+        tags.append("ice sheet")
+
     # volcanic (GLiM basic volcanic class present)
     glim_vb = row.get("glim_vb", np.nan)
     if not pd.isna(glim_vb) and int(glim_vb) == 1:

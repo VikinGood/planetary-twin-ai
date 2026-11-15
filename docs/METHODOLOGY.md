@@ -45,9 +45,11 @@ for scoring; they are listed in DATASETS.md for reference only.
 - **Moon:** LOLA LDEM gridded DEM (native ~118 m at 16 ppd) → bilinear resample to 1 km.
 - **Mars:** MOLA MEGDR (native ~463 m at 1/128°) → bilinear resample to 1 km.
 
-**Earth variables** (derived from 1 km resampled Copernicus DEM GLO-30):
-slope (°), roughness (std-dev of elevation in m in 3×3 km window), local relief (range of
-elevation in m within 12 km neighborhood radius).
+**Earth variables** (derived from Copernicus DEM GLO-30 reprojected to 1 km baseline):
+slope (°: mean of 1 km slopes across the 0.25° cell), slope_std (°: standard deviation of 1 km slopes),
+roughness (elevation standard deviation in meters), local relief (elevation range max − min within neighborhood).
+High mountain cells with significant relief reach mean slopes well above 10° (e.g., Mount Everest ~18.5°,
+Mount Aconcagua ~15.8°, compared to Amazon flatlands ~0.8°).
 
 **Moon variables** (derived from 1 km resampled LOLA LDEM):
 slope (°), roughness (m), local relief (m) — same algorithms as Earth side.
@@ -111,9 +113,11 @@ This normalizes out the absolute temperature gap.
 potential evapotranspiration (pet, mm/yr); aridity index = pr / pet.  
 **Moon/Mars:** Requirement — both are maximally arid; no liquid water.
 
-**Scoring:** `score = 1 − min(pr/pet, 1)`.  
-Score = 1 for hyperarid (pr/pet → 0); score = 0 for humid (pr/pet ≥ 1).  
-Cells with permanent ice cover scored 0 (liquid-water proxy condition not met for aridity test).
+**Scoring:** `score = max(1 − min(pr/pet, 1), 1 − min(pr / 250 mm, 1))`.  
+Score = 1 for hyperarid (pr/pet → 0 or pr = 0 mm/yr); score = 0 for humid (pr/pet ≥ 1 and pr ≥ 250 mm/yr).  
+This dual formulation ensures cold/polar deserts (such as Devon Island and the Antarctic plateau)
+with precipitation under 250 mm/yr correctly score as arid analogs despite low potential evapotranspiration (PET).
+Permanent ice sheets are not zeroed out for aridity (their absence of liquid water is analog-relevant).
 
 ### 2.5 ice_polar
 
@@ -125,19 +129,18 @@ LROC permanently shadowed regions (PSR) atlas, lunar ice detections.
 **Mars variables:** Shallow water-ice maps (SWIM dataset), subsurface ice depth.
 
 **Scoring:**
-- Permafrost score: GZI value (0–1) directly.
-- Ice coverage score: ice fraction (0–1).
-- Latitude filter: cells with |latitude| > 55° get score multiplier 1.0;
-  23.5°–55° get 0.5; < 23.5° (tropics) get 0.0 (ice polar environments require high latitudes).
-- Final: geometric mean of (permafrost score × latitude_multiplier) and ice score.
+- Ground-ice score: `score = permafrost_index`.
+- Cells that are permanent ice sheet (`ice_cover_fraction >= 0.5`) score `0.5` and receive the tag `ice sheet`,
+  because glacier ice is not ice-cemented regolith.
+- `permafrost_index` is marked as proxy when derived from latitude zonation pending local IPA datasets.
 
 ### 2.6 volcanic_caves
 
 **Comparison rule:** Categorical — proxy, LOW confidence (labeled PROXY in data and UI).  
 **Earth variables (proxy):**
   - GLiM basic volcanic class (vb): indicates basaltic lithology.
-  - Distance to nearest Smithsonian GVP Holocene shield volcano, lava field, fissure vent,
-    or volcanic field (filtered to those four types from the full Holocene catalog).
+  - Distance to nearest Smithsonian GVP Holocene shield volcano, fissure vent,
+    or volcanic field (lava domes are excluded as they are built by viscous flows and do not produce tubes).
   - Combined into a categorical likelihood:
     - HIGH: GLiM vb class present AND distance ≤ 50 km to qualifying Holocene volcano.
     - MEDIUM: GLiM vb class present OR distance ≤ 100 km.
@@ -175,16 +178,25 @@ long shadows, extended day/night cycles. This is not "maximize illumination".
 
 For each Earth cell centroid latitude φ and each day d of the year (d = 0…364):
 ```
-declination(d)  = 23.44° × sin(360/365 × (d − 81))      [degrees]
-max_solar_elevation = 90° − |φ| + 23.44°                  (capped at 90°; summer solstice)
-cos_h0(d)       = −tan(φ) × tan(declination(d))
+declination(d)       = 23.44° × sin(360/365 × (d − 81))      [degrees]
+max_solar_elevation  = 90° − |φ| + 23.44°                  (capped at 90°; summer solstice)
+cos_h0(d)            = −tan(φ) × tan(declination(d))
   if cos_h0 ≥ 1 → polar night (day_fraction = 0)
   if cos_h0 ≤ −1 → midnight sun (day_fraction = 1)
   else → day_fraction = arccos(cos_h0) / π
-sun_fraction    = mean(day_fraction) over 365 days
 mean_solar_elevation = time-weighted mean of arcsin(sin(decl)·sin(φ) + cos(decl)·cos(φ)·sin(h0)/h0)
                        over all days above horizon
+longest_polar_night_days = maximum consecutive days where the solar center remains below horizon
+longest_polar_day_days   = maximum consecutive days of continuous 24-hour daylight
 ```
+
+**Variables:**
+1. `max_solar_elevation` (°): annual maximum solar elevation angle.
+   - Reference target anchor: Lunar south pole (~1.5° to 6.0°); Mars equator (~65°).
+   - Terrestrial range: 23.44° (Poles) to 90.0° (Equator).
+2. `mean_solar_elevation` (°): time-weighted mean solar elevation while above horizon.
+3. `longest_polar_night_days` (days): continuous 24-hour darkness (0 days below polar circle |lat| <= 66.56°; 182 days at pole).
+4. `longest_polar_day_days` (days): continuous 24-hour daylight / midnight sun (0 days below polar circle; 182 days at pole).
 
 **Key constraint (what Earth cannot reproduce):**
 The Moon's obliquity is ~1.54°, so solar elevation at the lunar south pole (−89.9°) stays
@@ -194,30 +206,9 @@ which reaches a **minimum of 23.44°** at the geographic South Pole. No Earth su
 replicate the Moon's near-horizontal sun regime. The percentile/regime comparison captures
 relative similarity but this fundamental gap must always be reported in `cannot_reproduce`.
 
-**Unit test anchors** (preprocessing must pass these before scoring runs):
-| latitude | max_solar_elev | sun_fraction |
-|---|---|---|
-| 0° (equator) | 90.00° | 0.500 |
-| −62.875° | 50.56° | 0.500 |
-| −90° (South Pole) | 23.44° | ~0.500 (circumpolar half-year) |
-
-**Earth variables** (all computed from latitude):
-  - Annual maximum solar elevation (°): `90° − |φ| + 23.44°`, capped at 90°.
-  - Annual mean solar elevation above horizon (°): integrated over 365 days.
-  - Annual fraction of time with sun above horizon (0–1): mean day_fraction over 365 days.
-
-**Moon variables:** LOLA polar illumination products:
-  - Average illumination fraction at the target (0–1).
-  - Solar elevation range at the target latitude (derived from orbital geometry).
-  - Reference percentile: mapped from LOLA illumination fraction onto the Earth distribution.
-
-**Mars variables:** Illumination is latitude-driven; computed from orbital parameters.
-Mars illumination gets **low default weight** (see mission presets); seasonal dust
-variation is captured in surface_optics instead.
-
-**Scoring:** Rank-transform each of the three Earth variables across all cells to [0, 1].
+**Scoring:** Rank-transform Earth variables across all cells to [0, 1].
 Score = 1 − |percentile_earth − percentile_target| for each variable.
-Final score = geometric mean of the three.
+Final score = geometric mean of the variable scores.
 
 ---
 
@@ -271,6 +262,7 @@ characteristic scores (not the weighted total).
 | `desert` | aridity score > 0.75 |
 | `arid` | aridity score > 0.50 (broader; overlaps desert) |
 | `polar` | \|latitude\| > 60° |
+| `ice sheet` | ice_cover_fraction ≥ 0.50 (permanent glacier ice) |
 | `volcanic` | volcanic_caves score > 0 (GLiM vb class present, any proximity) |
 | `cave` | volcanic_caves likelihood = HIGH (score = 1.0, lava-tube proxy threshold met) |
 

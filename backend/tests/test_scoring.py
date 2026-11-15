@@ -212,36 +212,58 @@ class TestTopographyScore:
 
 class TestAridityScore:
     def test_zero_pr_pet_gives_one(self):
-        row = _row(aridity_index=0.0, ice_cover_fraction=0.0)
+        row = _row(precipitation=0.0, pet=500.0, aridity_index=0.0, ice_cover_fraction=0.0)
         score, conf, detail = aridity_score(row)
         assert score == pytest.approx(1.0)
 
     def test_pr_equals_pet_gives_zero(self):
-        row = _row(aridity_index=1.0, ice_cover_fraction=0.0)
+        row = _row(precipitation=500.0, pet=500.0, aridity_index=1.0, ice_cover_fraction=0.0)
         score, conf, detail = aridity_score(row)
         assert score == pytest.approx(0.0)
 
     def test_pr_twice_pet_gives_zero(self):
-        row = _row(aridity_index=2.0, ice_cover_fraction=0.0)
+        row = _row(precipitation=600.0, pet=300.0, aridity_index=2.0, ice_cover_fraction=0.0)
         score, conf, detail = aridity_score(row)
         assert score == pytest.approx(0.0)
 
     def test_half_aridity_gives_half(self):
-        row = _row(aridity_index=0.5, ice_cover_fraction=0.0)
+        row = _row(precipitation=250.0, pet=500.0, aridity_index=0.5, ice_cover_fraction=0.0)
         score, conf, detail = aridity_score(row)
         assert score == pytest.approx(0.5)
 
-    def test_ice_cover_gives_zero(self):
-        row = _row(aridity_index=0.0, ice_cover_fraction=0.9)
+    def test_cold_desert_under_250mm_scores_arid(self):
+        # Devon Island / Antarctic plateau: low PR (50 mm), low PET (25 mm) -> P/PET = 2.0 (normally score 0),
+        # but 1 - P/250 = 1 - 50/250 = 0.8
+        row = _row(precipitation=50.0, pet=25.0, aridity_index=2.0, ice_cover_fraction=0.0)
         score, conf, detail = aridity_score(row)
-        assert score == 0.0
+        assert score == pytest.approx(0.8)
+
+    def test_ice_cover_not_zeroed(self):
+        # Permanent ice does not zero out aridity
+        row = _row(precipitation=0.0, pet=500.0, aridity_index=0.0, ice_cover_fraction=0.9)
+        score, conf, detail = aridity_score(row)
+        assert score == pytest.approx(1.0)
 
     def test_derived_from_pr_pet_when_aridity_missing(self):
-        row = _row(precipitation=100.0, pet=200.0)
+        row = _row(precipitation=125.0, pet=250.0)
         row["aridity_index"] = None  # simulate missing column
         score, conf, detail = aridity_score(row)
-        # aridity_index = 100/200 = 0.5 → score = 0.5
+        # aridity_index = 125/250 = 0.5 → 1 - 0.5 = 0.5, 1 - 125/250 = 0.5 → max = 0.5
         assert score == pytest.approx(0.5, abs=0.01)
+
+
+class TestIcePolarScore:
+    def test_permafrost_tundra_scores_full_index(self):
+        # Ground ice without permanent ice sheet (e.g. Devon Island, Siberian tundra)
+        row = _row(permafrost_index=0.8, ice_cover_fraction=0.0)
+        score, conf, detail = ice_polar_score(row, {})
+        assert score == pytest.approx(0.8)
+
+    def test_ice_sheet_scores_half(self):
+        # Ice sheet (glacier ice >= 0.5) scores 0.5
+        row = _row(permafrost_index=1.0, ice_cover_fraction=0.9)
+        score, conf, detail = ice_polar_score(row, {})
+        assert score == pytest.approx(0.5)
 
 
 # ---------------------------------------------------------------------------

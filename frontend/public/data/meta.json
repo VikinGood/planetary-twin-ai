@@ -1,0 +1,360 @@
+{
+ "mock": false,
+ "generated_at": "2026-11-15T03:28:54.516413+00:00",
+ "note": "Production static export generated from processed NASA Earth Engine DEM, MODIS, and TerraClimate datasets.",
+ "characteristics": [
+  {
+   "id": "topography",
+   "name": "Topography",
+   "description": "Slope, roughness, and local relief \u2014 primary safety and construction constraint.",
+   "comparison_rule": "absolute",
+   "proxy": false
+  },
+  {
+   "id": "geology",
+   "name": "Geology",
+   "description": "Lithology and regolith analog \u2014 indicates construction material and surface chemistry.",
+   "comparison_rule": "categorical",
+   "proxy": false
+  },
+  {
+   "id": "thermal",
+   "name": "Thermal",
+   "description": "Temperature extremes and daily range \u2014 hardware stress and thermal management.",
+   "comparison_rule": "percentile_regime",
+   "proxy": false
+  },
+  {
+   "id": "aridity",
+   "name": "Aridity",
+   "description": "Aridity and liquid-water absence \u2014 REQUIREMENT: score rewards proximity to maximum aridity.",
+   "comparison_rule": "requirement",
+   "proxy": false
+  },
+  {
+   "id": "ice_polar",
+   "name": "Ice and Polar",
+   "description": "Ground ice, permafrost, and polar light regime \u2014 in-situ water resource and polar environment.",
+   "comparison_rule": "categorical_and_absolute",
+   "proxy": false
+  },
+  {
+   "id": "volcanic_caves",
+   "name": "Volcanic Terrain and Caves",
+   "description": "Volcanic terrain and lava-tube proxy \u2014 natural shelter from radiation and thermal extremes.",
+   "comparison_rule": "categorical",
+   "proxy": true
+  },
+  {
+   "id": "surface_optics",
+   "name": "Surface Optics",
+   "description": "Albedo and dust \u2014 affects imaging, thermal balance, and surface operations.",
+   "comparison_rule": "absolute",
+   "proxy": false
+  },
+  {
+   "id": "illumination",
+   "name": "Illumination",
+   "description": "Solar elevation regime \u2014 LOW SUN analog for lunar south pole; latitude-driven for Mars.",
+   "comparison_rule": "percentile_regime",
+   "proxy": false
+  }
+ ],
+ "presets": {
+  "moon_landing": {
+   "body": "moon",
+   "mission_type": "landing",
+   "default_characteristics": [
+    "topography",
+    "surface_optics",
+    "thermal",
+    "illumination"
+   ],
+   "default_weights": {
+    "topography": 0.35,
+    "illumination": 0.25,
+    "surface_optics": 0.2,
+    "thermal": 0.2
+   },
+   "targets": [
+    {
+     "id": "peak_near_cabeus_b",
+     "name": "Peak near Cabeus B",
+     "lat": -84.9,
+     "lon": -47.0,
+     "description": "High peak adjacent to Cabeus B crater, south polar region. NASA release 24-136 candidate. 'Peak near Cabeus B' is an informal name; not in USGS Gazetteer.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "haworth",
+     "name": "Haworth",
+     "lat": -87.5,
+     "lon": -4.5,
+     "description": "Haworth crater area, south polar region. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "malapert_massif",
+     "name": "Malapert Massif",
+     "lat": -85.9,
+     "lon": -2.0,
+     "description": "Malapert Massif (informal; near Malapert crater), south polar region. Near-continuous illumination candidate. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "mons_mouton_plateau",
+     "name": "Mons Mouton Plateau",
+     "lat": -84.1,
+     "lon": -15.6,
+     "description": "Plateau region of Mons Mouton. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "mons_mouton",
+     "name": "Mons Mouton",
+     "lat": -84.1,
+     "lon": -15.6,
+     "description": "Summit of Mons Mouton, south polar mountain. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "nobile_rim_1",
+     "name": "Nobile Rim 1",
+     "lat": -85.2,
+     "lon": 53.5,
+     "description": "First candidate region on Nobile crater rim. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "nobile_rim_2",
+     "name": "Nobile Rim 2",
+     "lat": -84.8,
+     "lon": 57.0,
+     "description": "Second candidate region on Nobile crater rim. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "de_gerlache_rim_2",
+     "name": "de Gerlache Rim 2",
+     "lat": -88.5,
+     "lon": -88.0,
+     "description": "Second candidate region on de Gerlache crater rim. NASA release 24-136 candidate.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "slater_plain",
+     "name": "Slater Plain",
+     "lat": -88.3,
+     "lon": 140.0,
+     "description": "Relatively flat plain near south pole. NASA release 24-136 candidate. 'Slater Plain' is an informal name; not in USGS Gazetteer.",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    }
+   ]
+  },
+  "moon_base": {
+   "body": "moon",
+   "mission_type": "base",
+   "default_characteristics": [
+    "ice_polar",
+    "illumination",
+    "volcanic_caves",
+    "thermal",
+    "topography",
+    "geology"
+   ],
+   "default_weights": {
+    "ice_polar": 0.25,
+    "illumination": 0.2,
+    "volcanic_caves": 0.15,
+    "thermal": 0.15,
+    "topography": 0.15,
+    "geology": 0.1
+   },
+   "targets": [
+    {
+     "id": "shackleton_de_gerlache_ridge",
+     "name": "Shackleton\u2013de Gerlache Ridge",
+     "lat": -89.5,
+     "lon": -100.0,
+     "description": "High-illumination ridge between Shackleton and de Gerlache craters; PSR access for ice",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "marius_hills_pit",
+     "name": "Marius Hills Pit",
+     "lat": 14.1,
+     "lon": -56.3,
+     "description": "Lunar pit \u2014 probable lava-tube skylight; natural shelter candidate",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    }
+   ]
+  },
+  "mars_landing": {
+   "body": "mars",
+   "mission_type": "landing",
+   "default_characteristics": [
+    "topography",
+    "surface_optics",
+    "aridity",
+    "thermal"
+   ],
+   "default_weights": {
+    "topography": 0.4,
+    "surface_optics": 0.25,
+    "aridity": 0.2,
+    "thermal": 0.15
+   },
+   "targets": [
+    {
+     "id": "jezero_crater",
+     "name": "Jezero Crater",
+     "lat": 18.4,
+     "lon": 77.7,
+     "description": "Ancient river delta and lake bed; Mars 2020 Perseverance landing site",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "gale_crater",
+     "name": "Gale Crater",
+     "lat": -5.4,
+     "lon": 137.8,
+     "description": "Layered sedimentary mound; Mars Science Laboratory Curiosity site",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "meridiani_planum",
+     "name": "Meridiani Planum",
+     "lat": -1.9,
+     "lon": -5.5,
+     "description": "Hematite-bearing plains; Mars Exploration Rover Opportunity site",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    }
+   ]
+  },
+  "mars_base": {
+   "body": "mars",
+   "mission_type": "base",
+   "default_characteristics": [
+    "ice_polar",
+    "volcanic_caves",
+    "geology",
+    "thermal",
+    "aridity",
+    "topography"
+   ],
+   "default_weights": {
+    "ice_polar": 0.25,
+    "volcanic_caves": 0.2,
+    "geology": 0.15,
+    "thermal": 0.15,
+    "aridity": 0.15,
+    "topography": 0.1
+   },
+   "targets": [
+    {
+     "id": "arcadia_planitia",
+     "name": "Arcadia Planitia",
+     "lat": 46.7,
+     "lon": -172.0,
+     "description": "Shallow ground ice detected by SWIM; best current Mars ISRU water candidate",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    },
+    {
+     "id": "arsia_mons_cave_candidate",
+     "name": "Arsia Mons Cave Candidate",
+     "lat": -8.3,
+     "lon": -120.5,
+     "description": "Candidate lava-tube pit on Arsia Mons flank (MGC\u00b3); natural shelter analog",
+     "coordinate_status": "UNVERIFIED",
+     "value_origin": "literature"
+    }
+   ]
+  }
+ },
+ "cannot_reproduce": {
+  "moon": [
+   "Gravity: 1/6 g (1.62 m/s\u00b2)",
+   "Vacuum: about 10\u207b\u00b9\u2070 Pa",
+   "Unfiltered solar and cosmic radiation",
+   "Absolute temperatures from about 40 K to 400 K",
+   "14-day day/night cycle",
+   "Near-horizon sun all year at the south pole: on Earth the yearly maximum sun elevation is at least 23.4\u00b0",
+   "Sharp-edged, electrostatically charged regolith"
+  ],
+  "mars": [
+   "Gravity: 0.38 g (3.72 m/s\u00b2)",
+   "Atmosphere: about 0.6 kPa, 95% CO\u2082",
+   "No ozone layer: full UV and ionizing radiation",
+   "Global dust storms",
+   "Absolute temperatures from about \u2212140 \u00b0C to +20 \u00b0C",
+   "Perchlorates in the regolith"
+  ]
+ },
+ "known_analogs": [
+  {
+   "name": "Atacama Desert core",
+   "lat": -24.1,
+   "lon": -70.0
+  },
+  {
+   "name": "Haughton Crater, Devon Island",
+   "lat": 75.4,
+   "lon": -89.7
+  },
+  {
+   "name": "Death Valley",
+   "lat": 36.5,
+   "lon": -117.1
+  },
+  {
+   "name": "McMurdo Dry Valleys",
+   "lat": -77.5,
+   "lon": 162.0
+  },
+  {
+   "name": "Svalbard",
+   "lat": 79.0,
+   "lon": 16.0
+  },
+  {
+   "name": "Rio Tinto",
+   "lat": 37.7,
+   "lon": -6.6
+  },
+  {
+   "name": "Craters of the Moon, Idaho",
+   "lat": 43.4,
+   "lon": -113.5
+  },
+  {
+   "name": "Lanzarote",
+   "lat": 29.0,
+   "lon": -13.6
+  },
+  {
+   "name": "Mauna Kea, Hawaii",
+   "lat": 19.8,
+   "lon": -155.5
+  },
+  {
+   "name": "Iceland central highlands",
+   "lat": 64.9,
+   "lon": -17.5
+  }
+ ]
+}

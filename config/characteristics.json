@@ -134,7 +134,7 @@
       "LOW": "neither condition met"
     },
     "proxy_scores": { "HIGH": 1.0, "MEDIUM": 0.5, "LOW": 0.0 },
-    "qualifying_volcano_types": ["Shield volcano", "Lava dome(s)", "Fissure vent(s)", "Volcanic field"],
+    "qualifying_volcano_types": ["Shield volcano", "Fissure vent(s)", "Volcanic field"],
     "earth_variables": [
       { "name": "lithology_class_vb", "source": "GLiM — basic volcanic class (vb)", "units": "categorical" },
       { "name": "distance_to_holocene_volcano", "source": "Smithsonian GVP Holocene volcanoes, filtered by type", "units": "km" }

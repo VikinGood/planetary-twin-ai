@@ -356,35 +356,38 @@ def surface_optics_score(
 def aridity_score(earth_row: pd.Series) -> tuple[float, str, dict]:
     """Score aridity per METHODOLOGY §2.4: REQUIREMENT, no target reference needed.
 
-    score = 1 - min(aridity_index, 1)
-    aridity_index = pr / pet  (from earth row)
-    Cells with permanent ice cover score 0.
+    score = max(1 - min(P/PET, 1), 1 - min(P / 250 mm, 1))
+    so polar deserts with under 250 mm/yr score as arid.
+    Permanent ice is not penalized (liquid water absence rule updated).
     """
-    # Check ice_cover flag
-    ice_cover = _get_float(earth_row, "ice_cover_fraction", 0.0)
-    if ice_cover is not None and ice_cover >= 0.5:
-        return (
-            0.0,
-            "high",
-            {"note": "Permanent ice cover — aridity requirement not met", "ice_cover_fraction": ice_cover},
-        )
+    pr = _get_float(earth_row, "precipitation", None)
+    if pr is None:
+        pr = _get_float(earth_row, "annual_pr_mm", None)
+    pet = _get_float(earth_row, "pet", None)
+    if pet is None:
+        pet = _get_float(earth_row, "annual_pet_mm", None)
 
     aridity_index = _get_float(earth_row, "aridity_index", None)
     if aridity_index is None:
-        pr = _get_float(earth_row, "precipitation", None)
-        pet = _get_float(earth_row, "pet", None)
         if pr is not None and pet is not None and pet > 0:
             aridity_index = pr / pet
         else:
             aridity_index = 0.5  # neutral if data missing
 
-    score = max(0.0, 1.0 - min(aridity_index, 1.0))
+    p_pet_term = max(0.0, 1.0 - min(aridity_index, 1.0))
+    if pr is not None:
+        pr_250_term = max(0.0, 1.0 - min(pr / 250.0, 1.0))
+    else:
+        pr_250_term = 0.0
+
+    score = max(p_pet_term, pr_250_term)
     return (
         round(score, 4),
         "high",
         {
             "aridity_index": round(aridity_index, 4),
-            "score_formula": f"1 - min({aridity_index:.4f}, 1) = {score:.4f}",
+            "precipitation": pr,
+            "score_formula": f"max(1 - min(P/PET, 1), 1 - min(P/250, 1)) = {score:.4f}",
             "note": "REQUIREMENT — Moon and Mars are maximally arid",
         },
     )
@@ -398,45 +401,36 @@ def ice_polar_score(
     earth_row: pd.Series,
     target_ref: dict,  # kept for API consistency; not used in computation
 ) -> tuple[float, str, dict]:
-    """Score ice/polar per METHODOLOGY §2.5."""
-    lat = _get_float(earth_row, "lat_center", 0.0)
+    """Score ice/polar per METHODOLOGY §2.5.
+
+    ground-ice score = permafrost_index;
+    permanent ice sheet (ice_cover_fraction >= 0.5) scores 0.5 (glacier ice is not ice-cemented regolith).
+    """
     permafrost = _get_float(earth_row, "permafrost_index", 0.0)
     ice_cover = _get_float(earth_row, "ice_cover_fraction", 0.0)
-
-    # Latitude multiplier
-    abs_lat = abs(lat) if lat is not None else 0.0
-    if abs_lat > 55:
-        lat_mult = 1.0
-    elif abs_lat >= 23.5:
-        lat_mult = 0.5
-    else:
-        lat_mult = 0.0
 
     if permafrost is None:
         permafrost = 0.0
     if ice_cover is None:
         ice_cover = 0.0
 
-    permafrost_term = permafrost * lat_mult
-    ice_term = ice_cover
-
-    # Geometric mean of two terms; handle zeros
-    if permafrost_term <= 0.0 and ice_term <= 0.0:
-        score = 0.0
-    elif permafrost_term <= 0.0 or ice_term <= 0.0:
-        score = math.sqrt(max(permafrost_term, 0.0) * max(ice_term, 0.0))
+    if ice_cover >= 0.5:
+        score = 0.5
+        note = "Permanent ice sheet (score 0.5; glacier ice is not ice-cemented regolith)"
     else:
-        score = math.sqrt(permafrost_term * ice_term)
+        score = float(permafrost)
+        note = "Ground-ice score from permafrost index"
+
+    score = max(0.0, min(1.0, score))
 
     return (
         round(score, 4),
         "medium",
         {
             "permafrost_index": permafrost,
-            "latitude_multiplier": lat_mult,
-            "permafrost_term": round(permafrost_term, 4),
             "ice_cover_fraction": ice_cover,
-            "score_formula": f"sqrt({permafrost_term:.4f} * {ice_term:.4f})",
+            "score_formula": "0.5 if ice_cover >= 0.5 else permafrost_index",
+            "note": note,
         },
     )
 
@@ -767,6 +761,11 @@ def compute_environment_tags(earth_row: pd.Series, char_scores: dict[str, float]
     lat = _get_float(earth_row, "lat_center", 0.0)
     if lat is not None and abs(lat) > 60.0:
         tags.append("polar")
+
+    # ice sheet
+    ice_cover = _get_float(earth_row, "ice_cover_fraction", None)
+    if ice_cover is not None and ice_cover >= 0.5:
+        tags.append("ice sheet")
 
     # volcanic (GLiM vb class)
     glim_vb = earth_row.get("glim_vb", None)

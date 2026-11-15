@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import os
+import sys
 import urllib.request
 from pathlib import Path
 from typing import Sequence
