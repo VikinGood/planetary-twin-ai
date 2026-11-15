@@ -4,6 +4,7 @@
 // Files expected under DATA_BASE:
 //   meta.json                         characteristics, presets (targets), cannot_reproduce, known_analogs
 //   {body}_{mission_type}.json        GeoJSON FeatureCollection from scripts/export_static.py
+//   validation.json                   optional, Phase 6 (scripts/validate_phase6.py)
 //   interpretations/{body}_{mission_type}/{target_id}/{cell_id}.json   optional, Phase 4
 //
 // Data source switch: ?data=<base url> in the page URL, or VITE_DATA_BASE at build time.
@@ -25,6 +26,7 @@ async function getJson(path) {
 }
 
 export const loadMeta = () => getJson('meta.json');
+export const loadValidation = () => getJson('validation.json').catch(() => null);
 export const loadCollection = (presetKey) => getJson(`${presetKey}.json`);
 
 export async function loadInterpretation(presetKey, targetId, cellId) {

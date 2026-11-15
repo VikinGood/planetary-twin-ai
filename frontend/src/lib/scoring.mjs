@@ -122,3 +122,14 @@ export function overlap(listA, listB, toleranceDeg = 0.5) {
   }
   return pairs;
 }
+
+/** True when every target of the preset has the same scores in every cell (same published reference values). */
+export function targetsAreEquivalent(features) {
+  for (const f of features) {
+    for (const byTarget of Object.values(f.properties.scores || {})) {
+      const vals = Object.values(byTarget);
+      if (vals.some((v) => v !== vals[0])) return false;
+    }
+  }
+  return true;
+}

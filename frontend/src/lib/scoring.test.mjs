@@ -79,3 +79,9 @@ test('known analog recall counts hits in the top N', () => {
   const r = knownAnalogRecall(fs, { targetId: 't', selected: ['a'], weights: { a: 1 }, tags: [] }, 1);
   assert.deepEqual(r, { hits: 1, known: 1, topN: 1 });
 });
+
+test('equivalent targets are detected', async () => {
+  const { targetsAreEquivalent } = await import('./scoring.mjs');
+  assert.equal(targetsAreEquivalent([cell('x', { a: { t1: 0.5, t2: 0.5 } })]), true);
+  assert.equal(targetsAreEquivalent([cell('x', { a: { t1: 0.5, t2: 0.4 } })]), false);
+});

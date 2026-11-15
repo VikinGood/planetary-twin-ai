@@ -1,0 +1,879 @@
+{
+ "land_cells": 337611,
+ "sites": 12,
+ "method": "Percentile of each known analog site (best 0.25 deg cell within 0.5 deg) among all land cells, preset default characteristics and weights.",
+ "presets": {
+  "moon_landing": {
+   "peak_near_cabeus_b": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "haworth": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "malapert_massif": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "mons_mouton_plateau": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "mons_mouton": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "nobile_rim_1": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "nobile_rim_2": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "de_gerlache_rim_2": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "slater_plain": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 95.2
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 82.6
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 81.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 67.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 64.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 38.1
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 37.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 36.6
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 22.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 19.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 11.1
+     }
+    ]
+   }
+  },
+  "moon_base": {
+   "shackleton_de_gerlache_ridge": {
+    "top10": 3,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 96.6
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 94.5
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 92.3
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 51.7
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 50.0
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 48.9
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 46.8
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 46.4
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 46.3
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 41.8
+     },
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 38.9
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 4.0
+     }
+    ]
+   },
+   "marius_hills_pit": {
+    "top10": 0,
+    "top25": 1,
+    "sites": [
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 85.3
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 74.7
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 70.3
+     },
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 48.8
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 40.4
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 38.5
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 36.0
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 34.1
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 25.1
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 24.7
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 20.8
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 2.9
+     }
+    ]
+   }
+  },
+  "mars_landing": {
+   "jezero_crater": {
+    "top10": 1,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 91.9
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 88.3
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 83.2
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 73.5
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 69.8
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 66.7
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 59.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 44.9
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 32.7
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 27.1
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 18.0
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 11.1
+     }
+    ]
+   },
+   "gale_crater": {
+    "top10": 1,
+    "top25": 4,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 91.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 81.0
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 80.8
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 80.7
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 72.2
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 71.7
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 54.4
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 24.6
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 17.8
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 16.4
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 16.0
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 9.9
+     }
+    ]
+   },
+   "meridiani_planum": {
+    "top10": 2,
+    "top25": 3,
+    "sites": [
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 94.8
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 91.2
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 84.1
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 70.7
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 69.2
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 65.0
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 57.5
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 54.0
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 51.2
+     },
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 30.1
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 19.8
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 11.9
+     }
+    ]
+   }
+  },
+  "mars_base": {
+   "arcadia_planitia": {
+    "top10": 0,
+    "top25": 2,
+    "sites": [
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 85.3
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 83.4
+     },
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 64.5
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 62.9
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 61.8
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 56.9
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 37.2
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 37.0
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 34.4
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 32.8
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 19.7
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 7.6
+     }
+    ]
+   },
+   "arsia_mons_cave_candidate": {
+    "top10": 1,
+    "top25": 1,
+    "sites": [
+     {
+      "name": "McMurdo Dry Valleys",
+      "percentile": 99.1
+     },
+     {
+      "name": "Craters of the Moon (Idaho)",
+      "percentile": 74.2
+     },
+     {
+      "name": "Haughton Crater (Devon Island)",
+      "percentile": 74.1
+     },
+     {
+      "name": "SP Crater / Black Point Lava Flow (AZ)",
+      "percentile": 67.2
+     },
+     {
+      "name": "Svalbard (AMASE / Bockfjord)",
+      "percentile": 62.7
+     },
+     {
+      "name": "Lanzarote (PANGAEA)",
+      "percentile": 52.2
+     },
+     {
+      "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+      "percentile": 46.7
+     },
+     {
+      "name": "Rio Tinto",
+      "percentile": 46.5
+     },
+     {
+      "name": "Mars Desert Research Station (Utah)",
+      "percentile": 43.9
+     },
+     {
+      "name": "Kilauea Volcano",
+      "percentile": 43.0
+     },
+     {
+      "name": "Atacama Desert (Yungay)",
+      "percentile": 31.0
+     },
+     {
+      "name": "Ries Crater",
+      "percentile": 11.4
+     }
+    ]
+   }
+  }
+ }
+}

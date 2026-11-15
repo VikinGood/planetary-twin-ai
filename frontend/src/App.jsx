@@ -3,8 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import MapView from './components/MapView.jsx';
 import CandidateCard from './components/CandidateCard.jsx';
-import { loadCollection, loadMeta } from './lib/data.js';
-import { knownAnalogRecall, overlap, rankCandidates } from './lib/scoring.mjs';
+import { loadCollection, loadMeta, loadValidation } from './lib/data.js';
+import { overlap, rankCandidates, targetsAreEquivalent } from './lib/scoring.mjs';
 import { FAMILIES } from './lib/activities.js';
 
 const presetKey = (body, missionType) => `${body}_${missionType}`;
@@ -32,6 +32,11 @@ export default function App() {
   const [tags, setTags] = useState([]);
   const [excludeKnown, setExcludeKnown] = useState(true);
   const [picked, setPicked] = useState(null); // { key, presetKey, row }
+  const [validation, setValidation] = useState(null);
+
+  useEffect(() => {
+    loadValidation().then(setValidation);
+  }, []);
 
   useEffect(() => {
     loadMeta()
@@ -63,7 +68,7 @@ export default function App() {
       const opts = { targetId: s.targetId, selected: s.selected, weights: s.weights, tags, excludeKnown };
       out[k] = {
         rows: s.selected.length ? rankCandidates(col.features, { ...opts, limit: 10 }) : [],
-        recall: s.selected.length ? knownAnalogRecall(col.features, opts, 100) : null,
+        sameTargets: col.features.length > 0 && targetsAreEquivalent(col.features),
       };
     }
     if (mode === 'compare') {
@@ -210,9 +215,18 @@ export default function App() {
                     );
                   })}
                 </div>
-                {ranked[k]?.recall && (
-                  <p className="badge" title="Known analogs found in the top 100 when they are not excluded">
-                    Validation: {ranked[k].recall.hits} of {ranked[k].recall.known} known analogs in the top {ranked[k].recall.topN}
+                {ranked[k]?.sameTargets && p.targets.length > 1 && (
+                  <p className="note">
+                    These {p.targets.length} reference targets share the same published reference values, so they give the same ranking.
+                  </p>
+                )}
+                {validation?.presets?.[k]?.[s.targetId] && (
+                  <p className="badge" title={validation.method}>
+                    Validation (default weights): {validation.presets[k][s.targetId].sites
+                      .slice(0, 3)
+                      .map((x) => `${x.name} top ${Math.max(1, Math.ceil(100 - x.percentile))}%`)
+                      .join(' · ')}{' '}
+                    of {validation.land_cells.toLocaleString('en-US')} land cells
                   </p>
                 )}
               </section>
