@@ -28,3 +28,8 @@ Thumbs.db
 
 # Agent logs
 logs/
+
+# Large media
+docs/*.mp4
+*.mp4
+
