@@ -24,9 +24,17 @@ test('weighted geometric mean matches the methodology formula', () => {
   assert.equal(r.coverage, 1);
 });
 
-test('a zero on a selected characteristic drops the cell', () => {
+test('a hard failure (-1) on a selected characteristic drops the cell', () => {
+  const f = cell('x', { a: { t: -1 }, b: { t: 1 } });
+  const r = scoreCell(f, 't', ['a', 'b'], { a: 0.5, b: 0.5 });
+  assert.equal(r.total, 0);
+  assert.equal(r.parts[0].hardFail, true);
+});
+
+test('a zero is floored: heavily penalized but not dropped', () => {
   const f = cell('x', { a: { t: 0 }, b: { t: 1 } });
-  assert.equal(scoreCell(f, 't', ['a', 'b'], { a: 0.5, b: 0.5 }).total, 0);
+  const r = scoreCell(f, 't', ['a', 'b'], { a: 0.5, b: 0.5 });
+  assert.ok(Math.abs(r.total - Math.sqrt(0.01)) < 1e-9);
 });
 
 test('missing data reduces coverage instead of counting as zero', () => {

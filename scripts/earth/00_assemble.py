@@ -63,6 +63,7 @@ INPUT_FILES = {
     "volcanic_caves":  PROC_DIR / "earth_volcanic_caves_025deg.parquet",
     "ice_polar":       PROC_DIR / "earth_ice_polar_025deg.parquet",
     "illumination":    PROC_DIR / "earth_illumination_025deg.parquet",
+    "barren":          PROC_DIR / "earth_barren_025deg.parquet",
 }
 
 # ---------------------------------------------------------------------------
@@ -203,11 +204,12 @@ def main():
     is_desert = (merged["aridity_score"] > 0.75) if "aridity_score" in merged.columns else np.zeros(len(merged), dtype=bool)
     is_arid = (merged["aridity_score"] > 0.50) if "aridity_score" in merged.columns else np.zeros(len(merged), dtype=bool)
     is_polar = merged["lat_center"].abs() > 60.0
+    is_ice_sheet = (merged["ice_cover_fraction"] >= 0.5) if "ice_cover_fraction" in merged.columns else np.zeros(len(merged), dtype=bool)
     is_volcanic = (merged["glim_vb"] == 1) if "glim_vb" in merged.columns else np.zeros(len(merged), dtype=bool)
     is_cave = (merged["volcanic_caves_likelihood"] == "HIGH") if "volcanic_caves_likelihood" in merged.columns else np.zeros(len(merged), dtype=bool)
 
     tags_list = []
-    for d, a, p, v, c in zip(is_desert, is_arid, is_polar, is_volcanic, is_cave):
+    for d, a, p, sheet, v, c in zip(is_desert, is_arid, is_polar, is_ice_sheet, is_volcanic, is_cave):
         t = []
         if d:
             t.append("desert")
@@ -215,6 +217,8 @@ def main():
             t.append("arid")
         if p:
             t.append("polar")
+        if sheet:
+            t.append("ice sheet")
         if v:
             t.append("volcanic")
         if c:

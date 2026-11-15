@@ -72,6 +72,14 @@ def test_score_matches_geometric_mean_and_skips_missing():
     assert parts["geology"] is None
 
 
+def test_zero_is_floored_and_minus_one_drops():
+    sel, w = ["topography", "thermal"], {"topography": 0.5, "thermal": 0.5}
+    total, _, _ = score_feature(feature(topo=0.0, thermal=1.0)["properties"], "malapert_massif", sel, w)
+    assert abs(total - 0.1) < 1e-9
+    total, _, parts = score_feature(feature(topo=-1, thermal=1.0)["properties"], "malapert_massif", sel, w)
+    assert total == 0.0 and parts["topography"] == 0.0
+
+
 def test_rank_excludes_known_and_collapses_neighbours():
     fs = [feature("A", 0, 0, 0.9), feature("B", 0.25, 0, 0.89), feature("C", 20, 0, 0.5), feature("K", 40, 0, 1.0, known=True)]
     ids = [r[3]["properties"]["cell_id"] for r in rank_features(fs, "malapert_massif", ["topography"], {"topography": 1})]

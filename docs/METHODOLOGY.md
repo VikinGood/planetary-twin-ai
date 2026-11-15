@@ -210,6 +210,10 @@ relative similarity but this fundamental gap must always be reported in `cannot_
 Score = 1 − |percentile_earth − percentile_target| for each variable.
 Final score = geometric mean of the variable scores.
 
+### 2.9 Bare Surface Precondition (Vegetation Filter)
+
+**Analogs must be bare surfaces:** Planetary analog environments for the Moon and Mars must possess exposed bedrock, regolith, gravel, sand, or permanent ice substrates, devoid of dense terrestrial vegetation. Forest canopies, crop fields, and dense grasslands introduce complex biogenic optical scattering, organic soil layers, moisture retention, and mechanical cushioning completely absent from planetary surfaces. Notably, dense tropical rainforest canopies (such as in Indonesia, New Caledonia, or the Congo Basin) exhibit low broadband albedos (~0.12–0.15) that unconstrained optical matching would otherwise mistake for dark lunar mare basalt or regolith. To prevent these spurious analog identifications, a strict bare-surface precondition is enforced across all candidate screening: cells must have a `barren_sparse_fraction >= 0.5` derived from MODIS MCD12Q1 land cover (combining IGBP Class 16 Barren, Class 15 Snow/Ice, and Class 7 Open Shrublands). Only cells meeting this threshold (or verified reference analog sites preserved for validation) qualify as terrestrial analogs.
+
 ---
 
 ## 3. Mission type presets

@@ -1,6 +1,6 @@
 {
  "mock": false,
- "generated_at": "2026-11-15T03:28:54.516413+00:00",
+ "generated_at": "2026-11-15T03:58:07.577609+00:00",
  "note": "Production static export generated from processed NASA Earth Engine DEM, MODIS, and TerraClimate datasets.",
  "characteristics": [
   {
@@ -307,54 +307,100 @@
  },
  "known_analogs": [
   {
-   "name": "Atacama Desert core",
-   "lat": -24.1,
-   "lon": -70.0
+   "name": "Haughton Crater (Devon Island)",
+   "lat": 75.38,
+   "lon": -89.68,
+   "body": "Moon,Mars",
+   "type": "Impact crater / polar desert",
+   "source_url": "https://www.nasa.gov/centers-and-facilities/ames/haughton-mars-project/"
   },
   {
-   "name": "Haughton Crater, Devon Island",
-   "lat": 75.4,
-   "lon": -89.7
-  },
-  {
-   "name": "Death Valley",
-   "lat": 36.5,
-   "lon": -117.1
+   "name": "Atacama Desert (Yungay)",
+   "lat": -24.08,
+   "lon": -69.87,
+   "body": "Mars",
+   "type": "Hyperarid desert / astrobiology",
+   "source_url": "https://astrobiology.nasa.gov/news/yungay-the-driest-place-on-earth/"
   },
   {
    "name": "McMurdo Dry Valleys",
-   "lat": -77.5,
-   "lon": 162.0
+   "lat": -77.53,
+   "lon": 162.0,
+   "body": "Mars",
+   "type": "Cold polar desert / permafrost",
+   "source_url": "https://www.usgs.gov/centers/astrogeology-science-center/science/terrestrial-analogs"
   },
   {
-   "name": "Svalbard",
-   "lat": 79.0,
-   "lon": 16.0
+   "name": "Mauna Kea / Mauna Loa (HI-SEAS)",
+   "lat": 19.82,
+   "lon": -155.47,
+   "body": "Moon,Mars",
+   "type": "Basaltic volcanic terrain / habitat analog",
+   "source_url": "https://hi-seas.org/"
+  },
+  {
+   "name": "Lanzarote (PANGAEA)",
+   "lat": 29.03,
+   "lon": -13.67,
+   "body": "Moon,Mars",
+   "type": "Basaltic lava tubes / planetary field training",
+   "source_url": "https://www.esa.int/Enabling_Support/Space_Transportation/PANGAEA"
   },
   {
    "name": "Rio Tinto",
    "lat": 37.7,
-   "lon": -6.6
+   "lon": -6.65,
+   "body": "Mars",
+   "type": "Acidic iron-sulfate system / astrobiology",
+   "source_url": "https://astrobiology.nasa.gov/news/acid-river-mars-analog/"
   },
   {
-   "name": "Craters of the Moon, Idaho",
-   "lat": 43.4,
-   "lon": -113.5
+   "name": "Mars Desert Research Station (Utah)",
+   "lat": 38.41,
+   "lon": -110.79,
+   "body": "Mars",
+   "type": "Inverted fluvial channels / mudstones",
+   "source_url": "https://mdrs.marssociety.org/"
   },
   {
-   "name": "Lanzarote",
-   "lat": 29.0,
-   "lon": -13.6
+   "name": "Svalbard (AMASE / Bockfjord)",
+   "lat": 79.45,
+   "lon": 13.35,
+   "body": "Mars",
+   "type": "Basaltic polar permafrost / carbonate rosettes",
+   "source_url": "https://www.nasa.gov/missions/amase/"
   },
   {
-   "name": "Mauna Kea, Hawaii",
-   "lat": 19.8,
-   "lon": -155.5
+   "name": "Craters of the Moon (Idaho)",
+   "lat": 43.43,
+   "lon": -113.52,
+   "body": "Moon",
+   "type": "Basaltic flood lava / rift fissures",
+   "source_url": "https://www.nps.gov/crmo/learn/nature/apollo-astronauts.htm"
   },
   {
-   "name": "Iceland central highlands",
-   "lat": 64.9,
-   "lon": -17.5
+   "name": "SP Crater / Black Point Lava Flow (AZ)",
+   "lat": 35.58,
+   "lon": -111.64,
+   "body": "Moon,Mars",
+   "type": "Basaltic cinder cone / NASA Desert RATS",
+   "source_url": "https://www.nasa.gov/exploration/technology/desert_rats/"
+  },
+  {
+   "name": "Ries Crater",
+   "lat": 48.88,
+   "lon": 10.55,
+   "body": "Moon",
+   "type": "Suevite impact crater / Apollo field training",
+   "source_url": "https://www.geopark-ries.de/"
+  },
+  {
+   "name": "Kilauea Volcano",
+   "lat": 19.42,
+   "lon": -155.29,
+   "body": "Moon,Mars",
+   "type": "Active basaltic volcanism / basaltic glass",
+   "source_url": "https://www.usgs.gov/volcanoes/kilauea"
   }
  ]
 }

@@ -15,6 +15,8 @@ Produces:
 from __future__ import annotations
 
 import json
+import math
+import os
 import re
 import sys
 import unicodedata
@@ -31,7 +33,11 @@ from backend.data_loader import load_earth_cells, load_targets
 
 OUT_DIR = ROOT / "frontend" / "public" / "data"
 CONFIG_DIR = ROOT / "config"
+CACHE_DIR = ROOT / "data" / "raw" / "earth"
+REGION_CACHE_FILE = CACHE_DIR / "region_hints_cache.json"
+KNOWN_ANALOGS_CSV = ROOT / "data" / "reference" / "known_analogs.csv"
 WARN_SIZE_MB = 5.0
+MAX_TARGET_SIZE_MB = 3.0
 
 ALL_CHARS = [
     "topography",
@@ -42,19 +48,6 @@ ALL_CHARS = [
     "volcanic_caves",
     "surface_optics",
     "illumination",
-]
-
-KNOWN_ANALOGS = [
-    ("Atacama Desert core", -24.1, -70.0),
-    ("Haughton Crater, Devon Island", 75.4, -89.7),
-    ("Death Valley", 36.5, -117.1),
-    ("McMurdo Dry Valleys", -77.5, 162.0),
-    ("Svalbard", 79.0, 16.0),
-    ("Rio Tinto", 37.7, -6.6),
-    ("Craters of the Moon, Idaho", 43.4, -113.5),
-    ("Lanzarote", 29.0, -13.6),
-    ("Mauna Kea, Hawaii", 19.8, -155.5),
-    ("Iceland central highlands", 64.9, -17.5),
 ]
 
 CANNOT_REPRODUCE = {
@@ -77,49 +70,6 @@ CANNOT_REPRODUCE = {
     ],
 }
 
-REGIONS = [
-    ("Puna de Atacama", -25.0, -67.5),
-    ("Payunia volcanic field", -36.4, -69.2),
-    ("Patagonian basalt plateaus", -47.0, -70.5),
-    ("Altiplano salt flats", -20.3, -67.6),
-    ("Namib Desert", -24.5, 15.3),
-    ("Sahara, Tibesti", 20.8, 18.0),
-    ("Sahara, Hoggar", 23.3, 5.6),
-    ("Arabian Harrat Khaybar", 25.8, 39.9),
-    ("Rub al Khali", 20.5, 50.0),
-    ("Afar depression", 13.0, 41.0),
-    ("Gobi Desert", 43.0, 104.0),
-    ("Taklamakan Desert", 39.0, 83.0),
-    ("Qaidam Basin", 37.5, 93.0),
-    ("Tibetan Plateau, Changtang", 34.5, 85.0),
-    ("Lut Desert", 30.0, 58.5),
-    ("Great Victoria Desert", -28.5, 128.0),
-    ("Pilbara", -22.0, 118.0),
-    ("Kalahari", -23.5, 22.0),
-    ("Mojave volcanic fields", 34.9, -116.0),
-    ("Snake River Plain", 43.4, -113.5),
-    ("Sonoran, Pinacate", 31.8, -113.5),
-    ("Columbia Plateau", 47.0, -119.5),
-    ("Canadian Arctic Archipelago", 76.0, -95.0),
-    ("Greenland ice-free margin", 70.0, -51.0),
-    ("Ellesmere Island", 80.0, -80.0),
-    ("Taymyr Peninsula", 75.0, 100.0),
-    ("Kamchatka lava fields", 55.8, 160.3),
-    ("Yakutia permafrost plains", 66.0, 125.0),
-    ("Antarctic Peninsula ice-free", -63.5, -57.0),
-    ("Transantarctic nunataks", -84.0, -170.0),
-    ("Ethiopian Highlands lava", 11.5, 39.5),
-    ("Deccan Traps", 19.0, 75.0),
-    ("Siberian Traps", 66.0, 95.0),
-    ("Mongolian volcanic plateau", 47.5, 99.0),
-    ("Sinai Peninsula", 29.0, 33.8),
-    ("Danakil salt plain", 14.2, 40.3),
-    ("Karakum Desert", 39.5, 60.0),
-    ("Thar Desert", 27.0, 71.0),
-    ("Chihuahuan basalt fields", 31.5, -107.2),
-    ("Andean altiplano volcanoes", -22.5, -68.0),
-]
-
 
 def slugify(text: str) -> str:
     s = text.replace("–", " ").replace("—", " ")
@@ -128,42 +78,115 @@ def slugify(text: str) -> str:
     return re.sub(r"[\s-]+", "_", s)
 
 
-def get_region_hint(lat: float, lon: float) -> str:
-    # Nearest landmark region within 8 degrees
-    min_dist_sq = float("inf")
-    best_name = ""
-    for name, r_lat, r_lon in REGIONS:
-        d_sq = (lat - r_lat) ** 2 + (lon - r_lon) ** 2
-        if d_sq < min_dist_sq:
-            min_dist_sq = d_sq
-            best_name = name
-    if min_dist_sq <= 64.0:  # ~8 degrees
-        return best_name
-    # Fallback to broad geographic zone
-    if lat > 60:
-        return "High Northern Latitude"
-    if lat < -60:
-        return "Antarctic Region"
-    if -20 < lat < 20 and -30 < lon < 50:
-        return "Equatorial Africa"
-    if 15 < lat < 45 and -15 < lon < 60:
-        return "Sahara-Arabian Belt"
-    if 25 < lat < 50 and 60 < lon < 120:
-        return "Central Asian Basin"
-    if -40 < lat < -10 and 110 < lon < 155:
-        return "Australian Interior"
-    if -55 < lat < 10 and -80 < lon < -35:
-        return "South America"
-    if 15 < lat < 60 and -130 < lon < -60:
-        return "North American Interior"
-    return "Continental Interior"
+def normalize_weights(selected: list[str], weights: dict[str, float]) -> dict[str, float]:
+    sub = {c: float(weights.get(c, 0.0)) for c in selected}
+    tot = sum(sub.values())
+    if tot <= 0:
+        return {c: 1.0 / len(selected) for c in selected}
+    return {c: v / tot for c, v in sub.items()}
 
 
-def find_known_analog(lat: float, lon: float) -> tuple[bool, str | None]:
-    for name, a_lat, a_lon in KNOWN_ANALOGS:
-        if abs(lat - a_lat) <= 1.0 and abs(lon - a_lon) <= 1.0:
-            return True, name
-    return False, None
+# ---------------------------------------------------------------------------
+# Region hints resolution via FAO GAUL level1 in Earth Engine
+# ---------------------------------------------------------------------------
+
+def load_cached_regions() -> dict[str, str]:
+    if REGION_CACHE_FILE.exists():
+        try:
+            with open(REGION_CACHE_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def save_cached_regions(cache: dict[str, str]):
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    with open(REGION_CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, indent=1, ensure_ascii=False)
+
+
+def resolve_region_hints(cells: list[tuple[str, float, float]]) -> dict[str, str]:
+    """Resolve ADM1_NAME, ADM0_NAME for cells using FAO/GAUL/2015/level1."""
+    cache = load_cached_regions()
+    results = {}
+    to_query = []
+
+    for cid, lat, lon in cells:
+        if cid in cache:
+            results[cid] = cache[cid]
+        elif lat < -60.0:
+            results[cid] = "Antarctica"
+            cache[cid] = "Antarctica"
+        else:
+            to_query.append((cid, lat, lon))
+
+    if not to_query:
+        return results
+
+    print(f"[export_static] Resolving region hints for {len(to_query):,} uncached cells via FAO GAUL...")
+    try:
+        from scripts.earth.ee_utils import init_ee
+        import ee
+        init_ee()
+
+        gaul = ee.FeatureCollection("FAO/GAUL/2015/level1").select(["ADM1_NAME", "ADM0_NAME"])
+        join = ee.Join.saveFirst(matchKey="adm")
+        sf = ee.Filter.intersects(leftField=".geo", rightField=".geo")
+
+        chunk_size = 250
+        for i in range(0, len(to_query), chunk_size):
+            chunk = to_query[i:i + chunk_size]
+            pts = [
+                ee.Feature(ee.Geometry.Point([lon, lat]), {"cid": cid, "lat": lat, "lon": lon})
+                for cid, lat, lon in chunk
+            ]
+            pts_fc = ee.FeatureCollection(pts)
+            joined = join.apply(pts_fc, gaul, sf)
+            stripped = joined.map(lambda f: ee.Feature(None, {
+                "cid": f.get("cid"),
+                "lat": f.get("lat"),
+                "lon": f.get("lon"),
+                "adm1": ee.Algorithms.If(f.get("adm"), ee.Feature(f.get("adm")).get("ADM1_NAME"), None),
+                "adm0": ee.Algorithms.If(f.get("adm"), ee.Feature(f.get("adm")).get("ADM0_NAME"), None),
+            }))
+            res = stripped.getInfo()
+            for f in res.get("features", []):
+                p = f.get("properties", {})
+                cid = p.get("cid")
+                adm1 = p.get("adm1")
+                adm0 = p.get("adm0")
+                lat_val = float(p.get("lat", 0.0))
+                lon_val = float(p.get("lon", 0.0))
+
+                if adm1 and adm0:
+                    if "Antarctica" in str(adm0) or "Antarctica" in str(adm1):
+                        hint = "Antarctica"
+                    elif adm1 == "Administrative unit not available":
+                        hint = str(adm0)
+                    else:
+                        hint = f"{adm1}, {adm0}"
+                elif adm0:
+                    hint = str(adm0)
+                else:
+                    hint = f"Unnamed area ({lat_val:.2f}, {lon_val:.2f})"
+
+                results[cid] = hint
+                cache[cid] = hint
+
+        save_cached_regions(cache)
+    except Exception as e:
+        print(f"[export_static] Warning: EE GAUL resolution failed ({e}). Using geographic fallback.", file=sys.stderr)
+        for cid, lat, lon in to_query:
+            if lat < -60.0:
+                hint = "Antarctica"
+            else:
+                hint = f"Unnamed area ({lat:.2f}, {lon:.2f})"
+            results[cid] = hint
+            cache[cid] = hint
+        save_cached_regions(cache)
+
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -210,9 +233,9 @@ def score_topography_vec(earth_df: pd.DataFrame, target: dict, mission_type: str
         slope_score = np.exp(-((slope - mu_slope) ** 2) / (2 * 2.0 ** 2))
         rough_score = np.exp(-((roughness - mu_rough) ** 2) / (2 * 10.0 ** 2))
         
-        # Hard cap: slope > 12.0 deg -> score = 0
-        score = np.where(slope > 12.0, 0.0, np.sqrt(slope_score * rough_score))
-        return np.clip(score, 0.0, 1.0)
+        # Hard cap: slope > 12.0 deg -> score = -1.0
+        score = np.where(slope > 12.0, -1.0, np.sqrt(slope_score * rough_score))
+        return score
     else:
         # Base
         mu_slope = _ref_val(topo, "slope", 4.0)
@@ -222,8 +245,9 @@ def score_topography_vec(earth_df: pd.DataFrame, target: dict, mission_type: str
         slope_score = np.exp(-((slope - mu_slope) ** 2) / (2 * 2.0 ** 2))
         relief_score = np.exp(-((local_relief - mu_relief) ** 2) / (2 * 50.0 ** 2))
         
-        score = np.where(slope > 12.0, 0.0, np.sqrt(slope_score * relief_score))
-        return np.clip(score, 0.0, 1.0)
+        # Hard cap: slope > 12.0 deg -> score = -1.0 (same hard cap applies per METHODOLOGY §2.1)
+        score = np.where(slope > 12.0, -1.0, np.sqrt(slope_score * relief_score))
+        return score
 
 
 def score_thermal_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
@@ -237,7 +261,7 @@ def score_thermal_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
     s_diurnal = np.clip(1.0 - np.abs(earth_df["lst_diurnal_range_pct"].values - t_diurnal_pct), 0.0, 1.0)
     
     score = (s_mean * s_range * s_diurnal) ** (1.0 / 3.0)
-    return np.clip(score, 0.0, 1.0)
+    return score
 
 
 def score_surface_optics_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
@@ -248,7 +272,7 @@ def score_surface_optics_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray
     
     albedo = earth_df["broadband_albedo"].values
     score = np.exp(-((albedo - mu_albedo) ** 2) / (2 * sigma_eff ** 2))
-    return np.clip(score, 0.0, 1.0)
+    return score
 
 
 def score_illumination_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
@@ -260,7 +284,7 @@ def score_illumination_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
     s_night = np.clip(1.0 - np.abs(earth_df["longest_polar_night_days_pct"].values - t_night_pct), 0.0, 1.0)
     
     score = np.sqrt(s_elev * s_night)
-    return np.clip(score, 0.0, 1.0)
+    return score
 
 
 def score_geology_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
@@ -288,7 +312,7 @@ def score_geology_vec(earth_df: pd.DataFrame, target: dict) -> np.ndarray:
             elif any(kw in class_desc for kw in s_kw):
                 scores[i] = 0.5
             else:
-                scores[i] = 0.0
+                scores[i] = 0.1  # Categorical mismatch: low score (0.05-0.2), not 0
                 
     return scores
 
@@ -305,18 +329,28 @@ def score_volcanic_caves_vec(earth_df: pd.DataFrame) -> np.ndarray:
         elif lh == "MEDIUM":
             scores[i] = 0.5
         elif lh == "LOW":
-            scores[i] = 0.0
+            scores[i] = 0.1  # Categorical mismatch: low score (0.05-0.2), not 0
         else:
             scores[i] = None
             
     return scores
 
 
+def format_score(val) -> float | None:
+    """Format exported score: -1.0 for hard-fail, max(round(s, 3), 0.001) for positive, None for missing."""
+    if val is None or (isinstance(val, float) and (np.isnan(val) or np.isneginf(val))):
+        return None
+    val_f = float(val)
+    if val_f < 0:
+        return -1.0
+    return max(round(val_f, 3), 0.001)
+
+
 # ---------------------------------------------------------------------------
 # Export Logic
 # ---------------------------------------------------------------------------
 
-def export_meta(targets_data: dict):
+def export_meta(targets_data: dict, known_df: pd.DataFrame):
     missions_files = {
         "moon_landing": "moon-landing.json",
         "moon_base": "moon-base.json",
@@ -362,6 +396,18 @@ def export_meta(targets_data: dict):
             ],
         }
         
+    known_list = [
+        {
+            "name": r["name"],
+            "lat": float(r["lat"]),
+            "lon": float(r["lon"]),
+            "body": r["body"],
+            "type": r["type"],
+            "source_url": r["source_url"],
+        }
+        for _, r in known_df.iterrows()
+    ]
+    
     meta = {
         "mock": False,
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -369,7 +415,7 @@ def export_meta(targets_data: dict):
         "characteristics": chars_list,
         "presets": presets,
         "cannot_reproduce": CANNOT_REPRODUCE,
-        "known_analogs": [{"name": name, "lat": lat, "lon": lon} for name, lat, lon in KNOWN_ANALOGS],
+        "known_analogs": known_list,
     }
     
     meta_path = OUT_DIR / "meta.json"
@@ -382,10 +428,16 @@ def process_preset(
     earth_df: pd.DataFrame,
     targets_data: dict,
     preset_key: str,
-    top_n_per_target: int = 400,
-) -> dict:
+    top_n_per_char: int = 50,
+    top_n_default: int = 300,
+) -> tuple[dict, list[tuple[str, float, float]]]:
     parts = preset_key.split("_")
     body, mission_type = parts[0], parts[1]
+    
+    with open(CONFIG_DIR / "missions" / f"{body}-{mission_type}.json", encoding="utf-8") as f:
+        preset_cfg = json.load(f)
+    def_chars = preset_cfg["default_characteristics"]
+    def_weights = normalize_weights(def_chars, preset_cfg["default_weights"])
     
     targets_dict = targets_data.get("targets", {})
     relevant_targets = [
@@ -394,13 +446,11 @@ def process_preset(
     ]
     
     if not relevant_targets:
-        return {"type": "FeatureCollection", "features": []}
+        return {"type": "FeatureCollection", "features": []}, []
         
     print(f"[export_static] Processing {preset_key} ({len(relevant_targets)} targets)...")
     
-    n_cells = len(earth_df)
-    
-    # Precompute target-independent scores
+    # Precompute target-independent scores on earth_df
     aridity_arr = earth_df["aridity_score"].values.astype(float)
     ice_polar_arr = earth_df["ice_polar_score"].values.astype(float)
     volcanic_caves_arr = score_volcanic_caves_vec(earth_df)
@@ -418,45 +468,133 @@ def process_preset(
         scores["illumination"][tid] = score_illumination_vec(earth_df, tgt)
         scores["geology"][tid] = score_geology_vec(earth_df, tgt)
         
-    # Select top candidate cells
+    # Selection of candidate cells
+    # Eligible universe: barren_sparse_fraction >= 0.5 OR is_known_analog
+    eligible_indices = np.where(earth_df["eligible_barren"].values)[0]
+    print(f"  Eligible candidate cells (barren >= 0.5 or known analog): {len(eligible_indices):,}")
+    
     top_indices = set()
+    
+    # 1. Top cells by default combination for every target
+    for tgt in relevant_targets:
+        tid = tgt["id"]
+        hard_fail = np.zeros(len(eligible_indices), dtype=bool)
+        log_sum = np.zeros(len(eligible_indices), dtype=float)
+        
+        for c in def_chars:
+            w_c = def_weights[c]
+            s_all = scores[c][tid]
+            s_sub = s_all[eligible_indices]
+            
+            # None or NaN check
+            is_valid = np.array([x is not None and not (isinstance(x, float) and np.isnan(x)) for x in s_sub])
+            # If s < 0 -> hard fail
+            is_neg = np.array([x is not None and isinstance(x, (int, float)) and x < 0 for x in s_sub])
+            hard_fail |= is_neg
+            
+            # Floor valid positive values to 0.01
+            val = np.where(is_valid & ~is_neg, np.clip(s_sub.astype(float), 0.01, 1.0), 0.01)
+            log_sum += w_c * np.log(val)
+            
+        comb_scores = np.where(hard_fail, -1.0, np.exp(log_sum))
+        valid_comb_mask = comb_scores > 0
+        
+        if np.any(valid_comb_mask):
+            k = min(top_n_default, int(valid_comb_mask.sum()))
+            comb_for_sort = np.where(valid_comb_mask, comb_scores, -1.0)
+            part_idx = np.argpartition(comb_for_sort, -k)[-k:]
+            top_indices.update(eligible_indices[part_idx].tolist())
+            
+    # 2. Top cells per individual characteristic for every target
     for char_id in ALL_CHARS:
-        for tid, arr in scores[char_id].items():
-            valid_mask = np.array([x is not None and not np.isnan(x) for x in arr])
+        for tgt in relevant_targets:
+            tid = tgt["id"]
+            arr = scores[char_id][tid][eligible_indices]
+            valid_mask = np.array([x is not None and not (isinstance(x, float) and np.isnan(x)) and float(x) > 0 for x in arr])
             if not np.any(valid_mask):
                 continue
-            numeric_vals = np.where(valid_mask, arr.astype(float), -1.0)
-            k = min(top_n_per_target, len(numeric_vals))
-            idx_part = np.argpartition(numeric_vals, -k)[-k:]
-            top_indices.update(idx_part.tolist())
+            num_vals = np.where(valid_mask, arr.astype(float), -1.0)
+            k = min(top_n_per_char, int(valid_mask.sum()))
+            part_idx = np.argpartition(num_vals, -k)[-k:]
+            top_indices.update(eligible_indices[part_idx].tolist())
             
-    # Always include known analog cells
-    known_mask = earth_df["known_analog_within_km"].values >= 0
-    known_indices = np.where(known_mask)[0]
+    # 3. Always include known analog cells
+    known_indices = np.where(earth_df["is_known_analog"].values)[0]
     top_indices.update(known_indices.tolist())
     
     selected_indices = sorted(top_indices)
     print(f"  Selected {len(selected_indices):,} unique candidate cells.")
     
+    coords_for_regions = [
+        (str(earth_df.iloc[idx]["cell_id"]), float(earth_df.iloc[idx]["lat_center"]), float(earth_df.iloc[idx]["lon_center"]))
+        for idx in selected_indices
+    ]
+    
+    return {
+        "preset_key": preset_key,
+        "selected_indices": selected_indices,
+        "scores": scores,
+        "relevant_targets": relevant_targets,
+        "def_chars": def_chars,
+        "def_weights": def_weights,
+    }, coords_for_regions
+
+
+def build_geojson(
+    earth_df: pd.DataFrame,
+    preset_pack: dict,
+    region_hints: dict[str, str],
+) -> tuple[dict, dict]:
+    selected_indices = preset_pack["selected_indices"]
+    scores = preset_pack["scores"]
+    relevant_targets = preset_pack["relevant_targets"]
+    def_chars = preset_pack["def_chars"]
+    def_weights = preset_pack["def_weights"]
+    
     features = []
+    first_target_id = relevant_targets[0]["id"]
+    
+    n_positive_comb = 0
+    n_antarctica = 0
+    
     for idx in selected_indices:
         row = earth_df.iloc[idx]
         lat = float(row["lat_center"])
         lon = float(row["lon_center"])
         cell_id = str(row["cell_id"])
+        is_known = bool(row["is_known_analog"])
+        known_name = row["known_analog_name"] if is_known else None
+        region_hint = region_hints.get(cell_id, f"Unnamed area ({lat:.2f}, {lon:.2f})")
         
-        is_known, known_name = find_known_analog(lat, lon)
-        region_hint = get_region_hint(lat, lon)
-        
+        if lat < -60.0:
+            n_antarctica += 1
+            
         # Build score dict for this cell
         cell_scores = {c: {} for c in ALL_CHARS}
         for c in ALL_CHARS:
             for tid in scores[c]:
                 val = scores[c][tid][idx]
-                cell_scores[c][tid] = round(float(val), 3) if val is not None else None
+                cell_scores[c][tid] = format_score(val)
                 
-        # Main measured values with units and source
+        # Compute default combination score for the first target
+        hard_fail = False
+        log_sum = 0.0
+        for c in def_chars:
+            s = cell_scores[c].get(first_target_id)
+            if s is None or s < 0:
+                hard_fail = True
+                break
+            log_sum += def_weights[c] * math.log(max(0.01, min(1.0, s)))
+        def_score_first_tgt = -1.0 if hard_fail else round(math.exp(log_sum), 3)
+        if def_score_first_tgt > 0.05:
+            n_positive_comb += 1
+            
         values = {
+            "barren_sparse_fraction": {
+                "value": round(float(row["barren_sparse_fraction"]), 2),
+                "units": "fraction",
+                "source": "MODIS MCD12Q1",
+            },
             "slope_mean_deg": {
                 "value": round(float(row["slope"]), 1),
                 "units": "degrees",
@@ -537,9 +675,30 @@ def process_preset(
                 "values": values,
             },
         }
-        features.append(feature)
+        features.append((def_score_first_tgt, feature))
         
-    return {"type": "FeatureCollection", "features": features}
+    features.sort(key=lambda x: x[0], reverse=True)
+    top_5 = [
+        {
+            "cell_id": f["properties"]["cell_id"],
+            "lat": f["properties"]["lat_center"],
+            "lon": f["properties"]["lon_center"],
+            "region_hint": f["properties"]["region_hint"],
+            "default_score": score,
+        }
+        for score, f in features[:5]
+    ]
+    
+    fc = {"type": "FeatureCollection", "features": [f for _, f in features]}
+    
+    stats = {
+        "n_features": len(features),
+        "n_positive_comb": n_positive_comb,
+        "n_antarctica": n_antarctica,
+        "first_target_id": first_target_id,
+        "top_5": top_5,
+    }
+    return fc, stats
 
 
 def main():
@@ -549,35 +708,84 @@ def main():
     earth_df = load_earth_cells()
     print(f"  Loaded {len(earth_df):,} land cells.")
     
+    print(f"[export_static] Loading known analogs from {KNOWN_ANALOGS_CSV}...")
+    known_df = pd.read_csv(KNOWN_ANALOGS_CSV)
+    print(f"  Loaded {len(known_df)} known analog sites.")
+    
+    is_known_mask = np.zeros(len(earth_df), dtype=bool)
+    known_name_arr = np.full(len(earth_df), None, dtype=object)
+    
+    for _, r in known_df.iterrows():
+        d = np.hypot(earth_df["lat_center"].values - r["lat"], earth_df["lon_center"].values - r["lon"])
+        match = d <= 0.5
+        is_known_mask |= match
+        for idx in np.where(match)[0]:
+            if known_name_arr[idx] is None:
+                known_name_arr[idx] = r["name"]
+                
+    earth_df["is_known_analog"] = is_known_mask
+    earth_df["known_analog_name"] = known_name_arr
+    print(f"  Flagged {is_known_mask.sum():,} cells within 0.5° of a known analog site.")
+    
+    eligible_mask = (earth_df["barren_sparse_fraction"].values >= 0.5) | is_known_mask
+    earth_df["eligible_barren"] = eligible_mask
+    print(f"  Eligible screening pool: {eligible_mask.sum():,} cells (barren >= 0.5 or known analog).")
+    
     print("[export_static] Loading reference targets...")
     targets_data = load_targets()
     
     # 1. Export meta.json
-    export_meta(targets_data)
+    export_meta(targets_data, known_df)
     
-    # 2. Export four presets
-    # Top-N per target: 300 for moon_landing (9 targets -> ~1800 cells), 600 for others (2-3 targets -> ~1500 cells)
-    # This keeps file sizes strictly between 1.5 MB and 3.5 MB, well below the 5 MB limit.
-    preset_configs = [
-        ("moon_landing", 60),
-        ("moon_base", 120),
-        ("mars_landing", 120),
-        ("mars_base", 150),
-    ]
+    # 2. Select candidates for each preset
+    presets_to_process = ["moon_landing", "moon_base", "mars_landing", "mars_base"]
+    packs = {}
+    all_coords_to_resolve = []
     
-    for preset_key, top_n in preset_configs:
-        collection = process_preset(earth_df, targets_data, preset_key, top_n_per_target=top_n)
-        out_file = OUT_DIR / f"{preset_key}.json"
+    for p_key in presets_to_process:
+        pack, coords = process_preset(
+            earth_df,
+            targets_data,
+            p_key,
+            top_n_per_char=50,
+            top_n_default=300,
+        )
+        packs[p_key] = pack
+        all_coords_to_resolve.extend(coords)
+        
+    unique_cells_dict = {}
+    for cid, lat, lon in all_coords_to_resolve:
+        unique_cells_dict[cid] = (cid, lat, lon)
+    unique_cells = list(unique_cells_dict.values())
+    print(f"[export_static] Resolving region hints for {len(unique_cells):,} unique exported cells...")
+    region_hints = resolve_region_hints(unique_cells)
+    print(f"[export_static] Resolved region hints for {len(region_hints):,} cells.")
+    
+    # 3. Build GeoJSON for each preset and report stats
+    report_data = {}
+    for p_key in presets_to_process:
+        fc, stats = build_geojson(earth_df, packs[p_key], region_hints)
+        out_file = OUT_DIR / f"{p_key}.json"
         with open(out_file, "w", encoding="utf-8") as f:
-            json.dump(collection, f, separators=(",", ":"), ensure_ascii=False)
+            json.dump(fc, f, separators=(",", ":"), ensure_ascii=False)
             
         size_mb = out_file.stat().st_size / (1024 * 1024)
-        n_feats = len(collection["features"])
-        print(f"[export_static] Wrote {n_feats:,} features -> {out_file.name} ({size_mb:.2f} MB)")
+        stats["size_mb"] = size_mb
+        report_data[p_key] = stats
+        
+        print(f"\n[export_static] Preset: {p_key}")
+        print(f"  Feature count: {stats['n_features']:,}")
+        print(f"  File size: {size_mb:.2f} MB")
+        print(f"  Non-null, non-negative default combination score > 0.05: {stats['n_positive_comb']:,}")
+        print(f"  Cells in Antarctica (lat < -60): {stats['n_antarctica']:,}")
+        print(f"  Top 5 cells for target '{stats['first_target_id']}':")
+        for rank, c in enumerate(stats["top_5"], 1):
+            print(f"    {rank}. {c['cell_id']} ({c['lat']:+.3f}, {c['lon']:+.3f}) | {c['region_hint']} | default score = {c['default_score']:.3f}")
+            
         if size_mb > WARN_SIZE_MB:
             print(f"  WARNING: File size {size_mb:.2f} MB exceeds {WARN_SIZE_MB} MB limit!", file=sys.stderr)
             
-    print("[export_static] All exports completed successfully.")
+    print("\n[export_static] All static exports completed successfully.")
 
 
 if __name__ == "__main__":

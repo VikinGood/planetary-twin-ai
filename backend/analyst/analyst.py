@@ -32,20 +32,28 @@ def normalize_weights(selected: list[str], weights: dict) -> dict:
     return {c: (r / total if total > 0 else 1 / len(selected)) for c, r in zip(selected, raw)}
 
 
+SCORE_FLOOR = 0.01
+HARD_FAIL = -1
+
+
 def score_feature(props: dict, target_id: str, selected: list[str], weights: dict) -> tuple[float | None, float, dict]:
-    """Weighted geometric mean over the selected characteristics that have data."""
+    """Weighted geometric mean over the selected characteristics that have data.
+
+    Same rules as frontend/src/lib/scoring.mjs: values below SCORE_FLOOR are raised to it
+    (penalized, not dropped); -1 marks a failed hard requirement and drops the cell.
+    """
     w = normalize_weights(selected, weights)
     scores = props.get("scores", {})
     used, log_sum, zero, parts = 0.0, 0.0, False, {}
     for c in selected:
         v = (scores.get(c) or {}).get(target_id)
         if isinstance(v, (int, float)) and math.isfinite(v):
-            parts[c] = round(float(v), 3)
+            parts[c] = 0.0 if v < 0 else round(float(v), 3)
             used += w[c]
-            if v <= 0:
+            if v < 0:
                 zero = True
             else:
-                log_sum += w[c] * math.log(min(1.0, v))
+                log_sum += w[c] * math.log(min(1.0, max(SCORE_FLOOR, v)))
         else:
             parts[c] = None
     if used == 0:

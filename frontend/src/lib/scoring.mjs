@@ -4,9 +4,17 @@
 // The exported files store one score in [0, 1] per characteristic and per target for
 // every candidate cell. The dashboard combines the characteristics the user selects with
 // a weighted geometric mean (docs/METHODOLOGY.md): total = prod(s_i ^ w_i), with the
-// weights normalized over the selected characteristics. A selected characteristic that
-// scores 0 drops the cell. A characteristic with no data (null) is left out of the
-// product and reduces `coverage`, which the UI shows next to the score.
+// weights normalized over the selected characteristics.
+//
+// Score values in the export:
+//   0..1   similarity. Values below SCORE_FLOOR (rounding zeros, "low likelihood") are
+//          raised to SCORE_FLOOR: heavily penalized, but they do not drop the cell.
+//   -1     a hard requirement failed (for example landing slope above the cap): the cell
+//          is dropped when that characteristic is selected.
+//   null   no data: left out of the product; it lowers `coverage`, shown in the UI.
+
+export const SCORE_FLOOR = 0.01;
+export const HARD_FAIL = -1;
 
 /** Normalize the weights of the selected characteristics so they sum to 1. */
 export function normalizeWeights(selected, weights) {
@@ -34,10 +42,10 @@ export function scoreCell(feature, targetId, selected, weights) {
     const has = typeof value === 'number' && Number.isFinite(value);
     if (has) {
       usedWeight += w[id];
-      if (value <= 0) zero = true;
-      else logSum += w[id] * Math.log(Math.min(1, value));
+      if (value < 0) zero = true; // hard requirement failed
+      else logSum += w[id] * Math.log(Math.min(1, Math.max(SCORE_FLOOR, value)));
     }
-    return { id, score: has ? value : null, weight: w[id] };
+    return { id, score: has ? (value < 0 ? 0 : value) : null, weight: w[id], hardFail: has && value < 0 };
   });
   if (usedWeight === 0) return { total: null, coverage: 0, parts };
   // Geometric mean over the characteristics that have data, re-normalized.

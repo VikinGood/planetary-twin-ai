@@ -19,6 +19,22 @@ Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
 
+- 2026-11-15 (Export quality fixes pre-validation):
+  - Bare surface / vegetation filter: MODIS MCD12Q1 (IGBP classes 16, 15, 7) ingested (`earth_barren_025deg.parquet`).
+    Only cells with `barren_sparse_fraction >= 0.5` (or known analog sites) are screened, completely removing
+    tropical rainforest false-positives from Moon landing rankings.
+  - Scoring floor & hard-cap sentinels: scores below 0.01 floored to 0.01 in `scoring.mjs` and `analyst.py`.
+    Hard caps (slope > 12°) strictly emit `-1.0` (dropping cell when selected). No rounding zeroes (`max(round(s, 3), 0.001)`).
+    Categorical mismatches in geology and volcanic caves score 0.10.
+  - Real administrative names from Earth Engine `FAO/GAUL/2015/level1` (`ADM1_NAME`, `ADM0_NAME`) replacing
+    mock REGIONS list. Polar cells labeled "Antarctica". Cached in `data/raw/earth/region_hints_cache.json`.
+  - Canonical known analogs catalog `data/reference/known_analogs.csv` (12 sites) created, flagged within 0.5°,
+    and documented in `docs/DATA_SOURCES.md`.
+  - Multi-target export selection: top 300 cells by default combination per target plus top 50 per characteristic,
+    deduplicated union per preset strictly under 2.6 MB (`moon_landing`: 2.26 MB, `moon_base`: 2.58 MB,
+    `mars_landing`: 2.14 MB, `mars_base`: 2.25 MB).
+  - 65 pytest tests and 10 frontend tests passing; production build verified.
+
 - 2026-11-15 (Phase 3 fixes and Phase 5 static export):
   - Slope recalculated on Copernicus DEM GLO-30 reprojected to 1 km baseline before reducing
     mean and std to the 0.25° grid across 386 10°×10° land tiles with local caching. Global max
