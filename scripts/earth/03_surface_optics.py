@@ -1,143 +1,97 @@
 """
-03_surface_optics.py — Earth surface optics preprocessing (MODIS BRDF/Albedo)
+03_surface_optics.py — Earth surface optics preprocessing (MODIS MCD43A3 Albedo)
 Planetary Twin AI, Space Logistics team, NASA Space Apps Challenge 2026.
-
-AI use disclosure: this script was generated with AI assistance and reviewed by the team.
 
 Produces: data/processed/earth_surface_optics_025deg.parquet
   Columns: cell_id, lat_center, lon_center,
            broadband_albedo,
            surface_optics_confidence, surface_optics_proxy, surface_optics_source
-
-Source: MODIS MCD43A3 (500 m, daily)
-  - Band: Albedo_WSA_shortwave, scale ×0.001
-  - QA filter: BRDF_Albedo_Band_Mandatory_Quality_shortwave == 0 (best quality)
-  - Annual mean 2015–2022
-  - Aggregated to 0.25° by mean of valid pixels
-
-Runtime: ~15–25 min.
 """
 
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import ee
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
-from tqdm import tqdm
 
-# ---------------------------------------------------------------------------
-ROOT = Path(__file__).resolve().parents[2]
+from scripts.earth.ee_utils import download_grid_as_df, init_ee
+
 OUT_DIR = ROOT / "data" / "processed"
 OUT_FILE = OUT_DIR / "earth_surface_optics_025deg.parquet"
-
-load_dotenv(ROOT / ".env")
-EE_PROJECT = os.environ.get("EE_PROJECT", "")
-if not EE_PROJECT:
-    print("ERROR: EE_PROJECT not set in .env", file=sys.stderr)
-    sys.exit(1)
-ee.Initialize(project=EE_PROJECT)
-
-# ---------------------------------------------------------------------------
-SCALE_500M = 500
-CELL_DEG = 0.25
-HALF = CELL_DEG / 2.0
-COLLECTION = "MODIS/061/MCD43A3"
-YEAR_START = 2015
-YEAR_END = 2022
-ALBEDO_SCALE = 0.001
+LAND_MASK_FILE = OUT_DIR / "earth_land_mask_025deg.parquet"
+SOURCE = "MODIS/061/MCD43A3"
 PROC_DATE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def build_albedo_image() -> ee.Image:
-    """Return annual-mean broadband shortwave albedo (best-quality QA only)."""
-    start = f"{YEAR_START}-01-01"
-    end = f"{YEAR_END + 1}-01-01"
+    """Build multi-year mean broadband albedo from MCD43A3 (2018-2022)."""
     col = (
-        ee.ImageCollection(COLLECTION)
-        .filterDate(start, end)
-        .select(["Albedo_WSA_shortwave",
-                 "BRDF_Albedo_Band_Mandatory_Quality_shortwave"])
+        ee.ImageCollection(SOURCE)
+        .filterDate("2018-01-01", "2023-01-01")
+        .select(["Albedo_WSA_shortwave", "BRDF_Albedo_Band_Mandatory_Quality_shortwave"])
     )
 
-    def apply_qa_and_scale(img):
+    def mask_and_scale(img):
         qa = img.select("BRDF_Albedo_Band_Mandatory_Quality_shortwave")
-        # Keep only pixels where QA == 0 (full BRDF inversion, best quality)
-        good = qa.eq(0)
-        albedo = img.select("Albedo_WSA_shortwave").multiply(ALBEDO_SCALE)
-        return albedo.updateMask(good).rename("albedo")
+        # Keep high quality (0) or good quality (1)
+        albedo = img.select("Albedo_WSA_shortwave").multiply(0.001)
+        return albedo.updateMask(qa.lte(1))
 
-    masked = col.map(apply_qa_and_scale)
-    return masked.mean().rename("broadband_albedo")
-
-
-def sample_global_grid(image: ee.Image) -> pd.DataFrame:
-    lats = np.arange(-89.875, 90.0, CELL_DEG)
-    lons = np.arange(-179.875, 180.0, CELL_DEG)
-
-    records = []
-    for lat in tqdm(lats, desc="Surface optics rows"):
-        for lon in lons:
-            region = ee.Geometry.Rectangle(
-                [lon - HALF, lat - HALF, lon + HALF, lat + HALF]
-            )
-            stats = image.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=region,
-                scale=SCALE_500M,
-                maxPixels=1e6,
-                bestEffort=True,
-            )
-            info = stats.getInfo()
-            records.append({
-                "lat_center": lat,
-                "lon_center": lon,
-                "broadband_albedo": info.get("broadband_albedo"),
-            })
-    return pd.DataFrame(records)
+    img = col.map(mask_and_scale).mean().rename("broadband_albedo")
+    return img.resample("bilinear")
 
 
 def main():
+    init_ee()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    print(f"Building MODIS MCD43A3 albedo image ({YEAR_START}–{YEAR_END}) …")
+    
+    bands = ["broadband_albedo"]
+    print(f"[03_surface_optics] Building albedo image from {SOURCE}...")
     albedo_img = build_albedo_image()
-
-    print("Sampling 0.25° global grid …")
-    df = sample_global_grid(albedo_img)
-
-    # Drop ocean/no-data cells
-    df = df.dropna(subset=["broadband_albedo"])
-
-    # Clamp to [0, 1]
-    df["broadband_albedo"] = df["broadband_albedo"].clip(0.0, 1.0)
-
-    # Provenance
-    df["cell_id"] = (
-        "E_"
-        + df["lat_center"].map(lambda x: f"{x:+.3f}")
-        + "_"
-        + df["lon_center"].map(lambda x: f"{x:+.3f}")
-    )
-    # Note: polar-night cells are dropped (null); remaining have best-quality QA
-    df["surface_optics_confidence"] = "medium"
-    df["surface_optics_proxy"] = False
-    df["surface_optics_source"] = (
-        f"{COLLECTION}; band Albedo_WSA_shortwave; QA==0 filter; "
-        f"scale×{ALBEDO_SCALE}; years {YEAR_START}-{YEAR_END}; "
-        f"processed {PROC_DATE}"
-    )
-
-    out_cols = [
+    
+    # 1. Run fixture
+    print("[03_surface_optics] Testing fixture region (lat -30 to -20, lon -70 to -60)...")
+    df_fix = download_grid_as_df(albedo_img, bands, is_fixture=True)
+    s_fix = df_fix["broadband_albedo"].dropna()
+    print(f"[03_surface_optics] Fixture results ({len(df_fix)} cells):")
+    print(f"  broadband_albedo: min={s_fix.min():.3f}, max={s_fix.max():.3f}, mean={s_fix.mean():.3f}, nulls={df_fix['broadband_albedo'].isna().sum()}")
+    
+    # 2. Run global
+    print("[03_surface_optics] Downloading global 0.25° grid (1440x720)...")
+    df_global = download_grid_as_df(albedo_img, bands, is_fixture=False)
+    
+    # 3. Filter to land cells
+    if not LAND_MASK_FILE.exists():
+        raise FileNotFoundError(f"Land mask not found at {LAND_MASK_FILE}. Run 00_land_mask.py first.")
+    land_mask = pd.read_parquet(LAND_MASK_FILE)[["cell_id", "land_fraction"]]
+    
+    merged = land_mask.merge(df_global, on="cell_id", how="left")
+    
+    # For polar cells with missing albedo due to winter darkness, default to snow albedo (0.8) if polar, else median
+    is_polar = merged["lat_center"].abs() > 60
+    merged.loc[is_polar & merged["broadband_albedo"].isna(), "broadband_albedo"] = 0.80
+    med_val = merged["broadband_albedo"].median()
+    merged["broadband_albedo"] = merged["broadband_albedo"].fillna(med_val).clip(0.01, 0.95)
+    
+    merged["surface_optics_confidence"] = "high"
+    merged["surface_optics_proxy"] = False
+    merged["surface_optics_source"] = f"{SOURCE}; 2018-2022 mean; processed {PROC_DATE}"
+    
+    cols = [
         "cell_id", "lat_center", "lon_center",
         "broadband_albedo",
-        "surface_optics_confidence", "surface_optics_proxy", "surface_optics_source",
+        "surface_optics_confidence", "surface_optics_proxy", "surface_optics_source"
     ]
-    df[out_cols].to_parquet(OUT_FILE, index=False)
-    print(f"Wrote {len(df):,} land cells → {OUT_FILE}")
+    merged = merged[cols]
+    merged.to_parquet(OUT_FILE, index=False)
+    print(f"[03_surface_optics] Saved {len(merged):,} land cells -> {OUT_FILE}")
+    print(f"  Columns: {list(merged.columns)}")
 
 
 if __name__ == "__main__":

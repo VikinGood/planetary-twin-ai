@@ -182,14 +182,40 @@ def main():
         + "_"
         + merged["lon_center"].map(lambda x: f"{x:+.3f}")
     )
-    # land_fraction placeholder (see docstring — full fractional mask is Phase 3b)
-    merged["land_fraction"] = 1.0
+    # --- Land fraction from land mask ---
+    land_mask_path = PROC_DIR / "earth_land_mask_025deg.parquet"
+    if land_mask_path.exists():
+        lm = pd.read_parquet(land_mask_path)[["cell_id", "land_fraction"]]
+        if "land_fraction" in merged.columns:
+            merged = merged.drop(columns=["land_fraction"])
+        merged = merged.merge(lm, on="cell_id", how="left")
+        merged["land_fraction"] = merged["land_fraction"].fillna(1.0)
+    else:
+        merged["land_fraction"] = 1.0
 
     # --- Environment tags ---
     print("Computing environment tags …")
-    merged["environment_tags"] = [
-        build_env_tags(row) for _, row in tqdm(merged.iterrows(), total=len(merged))
-    ]
+    is_desert = (merged["aridity_score"] > 0.75) if "aridity_score" in merged.columns else np.zeros(len(merged), dtype=bool)
+    is_arid = (merged["aridity_score"] > 0.50) if "aridity_score" in merged.columns else np.zeros(len(merged), dtype=bool)
+    is_polar = merged["lat_center"].abs() > 60.0
+    is_volcanic = (merged["glim_vb"] == 1) if "glim_vb" in merged.columns else np.zeros(len(merged), dtype=bool)
+    is_cave = (merged["volcanic_caves_likelihood"] == "HIGH") if "volcanic_caves_likelihood" in merged.columns else np.zeros(len(merged), dtype=bool)
+
+    tags_list = []
+    for d, a, p, v, c in zip(is_desert, is_arid, is_polar, is_volcanic, is_cave):
+        t = []
+        if d:
+            t.append("desert")
+        if a:
+            t.append("arid")
+        if p:
+            t.append("polar")
+        if v:
+            t.append("volcanic")
+        if c:
+            t.append("cave")
+        tags_list.append(t)
+    merged["environment_tags"] = tags_list
 
     # --- Known-analog placeholder ---
     # Real values populated in Phase 3c when analog catalogs are downloaded.

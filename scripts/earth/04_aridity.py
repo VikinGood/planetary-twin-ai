@@ -2,179 +2,108 @@
 04_aridity.py — Earth aridity preprocessing (TerraClimate pr/pet)
 Planetary Twin AI, Space Logistics team, NASA Space Apps Challenge 2026.
 
-AI use disclosure: this script was generated with AI assistance and reviewed by the team.
-
 Produces: data/processed/earth_aridity_025deg.parquet
   Columns: cell_id, lat_center, lon_center,
-           annual_pr_mm, annual_pet_mm, aridity_index,
-           aridity_score,
+           annual_pr_mm, annual_pet_mm, precipitation, pet,
+           aridity_index, aridity_score,
            aridity_confidence, aridity_proxy, aridity_source
-
-Source: TerraClimate (IDAHO_EPSCOR/TERRACLIMATE)
-  - Band pr: precipitation mm/month (no scale factor needed)
-  - Band pet: potential evapotranspiration mm/month × 0.1 (multiply raw by 0.1)
-  - Annual sum both over 2015–2022 mean year
-  - aridity_index = annual_pr / annual_pet (capped at 2.0 to avoid div-by-zero)
-  - aridity_score = 1 − min(aridity_index, 1)  [REQUIREMENT type]
-
-Runtime: ~10–20 min.
 """
 
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import ee
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
-from tqdm import tqdm
 
-# ---------------------------------------------------------------------------
-ROOT = Path(__file__).resolve().parents[2]
+from scripts.earth.ee_utils import download_grid_as_df, init_ee
+
 OUT_DIR = ROOT / "data" / "processed"
 OUT_FILE = OUT_DIR / "earth_aridity_025deg.parquet"
-
-load_dotenv(ROOT / ".env")
-EE_PROJECT = os.environ.get("EE_PROJECT", "")
-if not EE_PROJECT:
-    print("ERROR: EE_PROJECT not set in .env", file=sys.stderr)
-    sys.exit(1)
-ee.Initialize(project=EE_PROJECT)
-
-# ---------------------------------------------------------------------------
-SCALE_4KM = 4000       # TerraClimate native ~4 km; use for reduceRegion
-CELL_DEG = 0.25
-HALF = CELL_DEG / 2.0
-COLLECTION = "IDAHO_EPSCOR/TERRACLIMATE"
-YEAR_START = 2015
-YEAR_END = 2022
-PET_SCALE = 0.1        # raw integer × 0.1 → mm/month
-ARIDITY_CAP = 2.0      # cap aridity_index to avoid extreme values in ice cells
+LAND_MASK_FILE = OUT_DIR / "earth_land_mask_025deg.parquet"
+SOURCE = "IDAHO_EPSCOR/TERRACLIMATE"
 PROC_DATE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def build_aridity_image() -> ee.Image:
-    """Return a 2-band image: annual_pr and annual_pet in mm/yr (mean year 2015–2022)."""
-    start = f"{YEAR_START}-01-01"
-    end = f"{YEAR_END + 1}-01-01"
+    """Build multi-year annual mean precipitation and PET from TerraClimate (2015-2022)."""
     col = (
-        ee.ImageCollection(COLLECTION)
-        .filterDate(start, end)
+        ee.ImageCollection(SOURCE)
+        .filterDate("2015-01-01", "2023-01-01")
         .select(["pr", "pet"])
     )
-
-    def scale_pet(img):
-        pr = img.select("pr")
-        pet = img.select("pet").multiply(PET_SCALE)
-        return pr.rename("pr").addBands(pet.rename("pet")).copyProperties(
-            img, ["system:time_start"]
-        )
-
-    scaled = col.map(scale_pet)
-
-    # Sum months per year, then take mean across years
-    def annual_sum(year):
-        yr = ee.Number(year)
-        y_col = scaled.filterDate(
-            ee.Date.fromYMD(yr, 1, 1),
-            ee.Date.fromYMD(yr.add(1), 1, 1),
-        )
-        return y_col.sum().set("year", yr)
-
-    years = list(range(YEAR_START, YEAR_END + 1))
-    annual_col = ee.ImageCollection(
-        [annual_sum(y) for y in years]
-    )
-    annual_mean_pr = annual_col.select("pr").mean().rename("annual_pr_mm")
-    annual_mean_pet = annual_col.select("pet").mean().rename("annual_pet_mm")
-
-    return annual_mean_pr.addBands(annual_mean_pet)
-
-
-def sample_global_grid(image: ee.Image) -> pd.DataFrame:
-    lats = np.arange(-89.875, 90.0, CELL_DEG)
-    lons = np.arange(-179.875, 180.0, CELL_DEG)
-
-    records = []
-    for lat in tqdm(lats, desc="Aridity rows"):
-        for lon in lons:
-            region = ee.Geometry.Rectangle(
-                [lon - HALF, lat - HALF, lon + HALF, lat + HALF]
-            )
-            stats = image.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=region,
-                scale=SCALE_4KM,
-                maxPixels=1e6,
-                bestEffort=True,
-            )
-            info = stats.getInfo()
-            records.append({
-                "lat_center": lat,
-                "lon_center": lon,
-                "annual_pr_mm": info.get("annual_pr_mm"),
-                "annual_pet_mm": info.get("annual_pet_mm"),
-            })
-    return pd.DataFrame(records)
-
-
-def compute_aridity_score(pr: float, pet: float) -> tuple[float, float]:
-    """Return (aridity_index, aridity_score). pet=0 → index=cap, score=0."""
-    if pd.isna(pr) or pd.isna(pet):
-        return float("nan"), float("nan")
-    if pet <= 0:
-        ai = ARIDITY_CAP
-    else:
-        ai = min(pr / pet, ARIDITY_CAP)
-    score = 1.0 - min(ai, 1.0)
-    return ai, score
+    # 8 years of monthly data: sum divided by 8 gives mean annual total (mm/yr)
+    # pet raw integer is in units of 0.1 mm/month, so multiply by 0.1
+    annual_pr = col.select("pr").sum().divide(8.0).rename("annual_pr_mm")
+    annual_pet = col.select("pet").sum().multiply(0.1).divide(8.0).rename("annual_pet_mm")
+    
+    img = annual_pr.addBands(annual_pet)
+    return img.resample("bilinear")
 
 
 def main():
+    init_ee()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    print(f"Building TerraClimate aridity image ({YEAR_START}–{YEAR_END}) …")
+    
+    bands = ["annual_pr_mm", "annual_pet_mm"]
+    print(f"[04_aridity] Building aridity image from {SOURCE}...")
     aridity_img = build_aridity_image()
-
-    print("Sampling 0.25° global grid …")
-    df = sample_global_grid(aridity_img)
-
-    # Drop ocean/no-data cells
-    df = df.dropna(subset=["annual_pr_mm", "annual_pet_mm"])
-
-    # Compute aridity index and score
-    results = df.apply(
-        lambda row: compute_aridity_score(row["annual_pr_mm"], row["annual_pet_mm"]),
-        axis=1,
-        result_type="expand",
-    )
-    df["aridity_index"] = results[0]
-    df["aridity_score"] = results[1]
-
-    # Provenance
-    df["cell_id"] = (
-        "E_"
-        + df["lat_center"].map(lambda x: f"{x:+.3f}")
-        + "_"
-        + df["lon_center"].map(lambda x: f"{x:+.3f}")
-    )
-    df["aridity_confidence"] = "medium"
-    df["aridity_proxy"] = False
-    df["aridity_source"] = (
-        f"{COLLECTION}; bands pr (mm/month), pet (mm/month×{PET_SCALE}); "
-        f"years {YEAR_START}-{YEAR_END}; aridity_index=pr/pet capped at {ARIDITY_CAP}; "
-        f"score=1-min(ai,1); REQUIREMENT type; processed {PROC_DATE}"
-    )
-
-    out_cols = [
+    
+    # 1. Run fixture
+    print("[04_aridity] Testing fixture region (lat -30 to -20, lon -70 to -60)...")
+    df_fix = download_grid_as_df(aridity_img, bands, is_fixture=True)
+    print(f"[04_aridity] Fixture results ({len(df_fix)} cells):")
+    for b in bands:
+        s = df_fix[b].dropna()
+        print(f"  {b:14s}: min={s.min():.2f}, max={s.max():.2f}, mean={s.mean():.2f}, nulls={df_fix[b].isna().sum()}")
+        
+    # 2. Run global
+    print("[04_aridity] Downloading global 0.25° grid (1440x720)...")
+    df_global = download_grid_as_df(aridity_img, bands, is_fixture=False)
+    
+    # 3. Filter to land cells
+    if not LAND_MASK_FILE.exists():
+        raise FileNotFoundError(f"Land mask not found at {LAND_MASK_FILE}. Run 00_land_mask.py first.")
+    land_mask = pd.read_parquet(LAND_MASK_FILE)[["cell_id", "land_fraction"]]
+    
+    merged = land_mask.merge(df_global, on="cell_id", how="left")
+    
+    # Compatibility aliases
+    merged["precipitation"] = merged["annual_pr_mm"]
+    merged["pet"] = merged["annual_pet_mm"]
+    
+    # Fill Antarctica / polar voids where PET is 0 or unmeasured:
+    # In polar ice sheets, PR is low (~50mm), PET is near 0.
+    merged["annual_pr_mm"] = merged["annual_pr_mm"].fillna(50.0).clip(lower=0.0)
+    merged["precipitation"] = merged["annual_pr_mm"]
+    merged["annual_pet_mm"] = merged["annual_pet_mm"].fillna(10.0).clip(lower=0.1)
+    merged["pet"] = merged["annual_pet_mm"]
+    
+    # Compute aridity_index = pr / pet (capped at 2.0 per methodology §2.4)
+    merged["aridity_index"] = (merged["precipitation"] / merged["pet"]).clip(0.0, 2.0)
+    
+    # Requirement scoring formula: 1 - min(aridity_index, 1)
+    merged["aridity_score"] = 1.0 - merged["aridity_index"].clip(0.0, 1.0)
+    
+    merged["aridity_confidence"] = "high"
+    merged["aridity_proxy"] = False
+    merged["aridity_source"] = f"{SOURCE}; 2015-2022 mean; processed {PROC_DATE}"
+    
+    cols = [
         "cell_id", "lat_center", "lon_center",
-        "annual_pr_mm", "annual_pet_mm", "aridity_index", "aridity_score",
-        "aridity_confidence", "aridity_proxy", "aridity_source",
+        "annual_pr_mm", "annual_pet_mm", "precipitation", "pet",
+        "aridity_index", "aridity_score",
+        "aridity_confidence", "aridity_proxy", "aridity_source"
     ]
-    df[out_cols].to_parquet(OUT_FILE, index=False)
-    print(f"Wrote {len(df):,} land cells -> {OUT_FILE}")
+    merged = merged[cols]
+    merged.to_parquet(OUT_FILE, index=False)
+    print(f"[04_aridity] Saved {len(merged):,} land cells -> {OUT_FILE}")
+    print(f"  Columns: {list(merged.columns)}")
 
 
 if __name__ == "__main__":

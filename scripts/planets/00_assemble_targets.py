@@ -362,6 +362,8 @@ def main():
     all_targets: dict = {}
     all_targets.update(moon_data["targets"])
     all_targets.update(mars_data["targets"])
+    for tid, t in all_targets.items():
+        t["value_origin"] = "literature"
     print(f"  Loaded {len(all_targets)} targets total.")
 
     # --- Optionally load Earth percentile distributions ---

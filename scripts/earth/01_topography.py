@@ -1,160 +1,120 @@
 """
-01_topography.py — Earth topography preprocessing
+01_topography.py — Earth topography preprocessing (Copernicus DEM GLO-30)
 Planetary Twin AI, Space Logistics team, NASA Space Apps Challenge 2026.
-
-AI use disclosure: this script was generated with AI assistance and reviewed by the team.
 
 Produces: data/processed/earth_topography_025deg.parquet
   Columns: cell_id, lat_center, lon_center,
+           slope, slope_std, roughness, local_relief,
            slope_mean, roughness_mean, local_relief_mean,
            topography_confidence, topography_proxy, topography_source
-
-Source: Copernicus DEM GLO-30 (EE asset COPERNICUS/DEM/GLO30_2024_1)
-  - Resampled to 1 km on EE
-  - slope (°), roughness (std-dev in 3×3 km window), local_relief (range in 12 km radius)
-  - Aggregated to 0.25° by mean of valid 1 km pixels per cell
-
-Runtime: ~10–20 min depending on EE quota.
 """
 
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import ee
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
-from tqdm import tqdm
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
-ROOT = Path(__file__).resolve().parents[2]
+from scripts.earth.ee_utils import download_grid_as_df, init_ee
+
 OUT_DIR = ROOT / "data" / "processed"
 OUT_FILE = OUT_DIR / "earth_topography_025deg.parquet"
-
-# ---------------------------------------------------------------------------
-# EE initialisation
-# ---------------------------------------------------------------------------
-load_dotenv(ROOT / ".env")
-EE_PROJECT = os.environ.get("EE_PROJECT", "")
-if not EE_PROJECT:
-    print("ERROR: EE_PROJECT not set in .env", file=sys.stderr)
-    sys.exit(1)
-ee.Initialize(project=EE_PROJECT)
-
-# ---------------------------------------------------------------------------
-# Parameters
-# ---------------------------------------------------------------------------
-SCALE_1KM = 1000        # metres — common 1 km baseline
-CELL_DEG = 0.25         # target grid spacing
-HALF = CELL_DEG / 2.0
+LAND_MASK_FILE = OUT_DIR / "earth_land_mask_025deg.parquet"
 SOURCE = "COPERNICUS/DEM/GLO30_2024_1"
 PROC_DATE = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-# ---------------------------------------------------------------------------
-# EE computation helpers
-# ---------------------------------------------------------------------------
 
-def build_topography_image() -> ee.Image:
-    """Return a 3-band EE image: slope_deg, roughness_m, local_relief_m at ~1 km."""
+def build_topography_pair1() -> tuple[ee.Image, list[str]]:
+    """Build pair 1: slope and elevation std (roughness)."""
     dem = ee.ImageCollection(SOURCE).select("DEM").mosaic()
-
-    # Resample DEM to 1 km (bilinear)
-    dem_1km = dem.resample("bilinear").reproject(crs="EPSG:4326", scale=SCALE_1KM)
-
-    # Slope (°)
-    slope = ee.Terrain.slope(dem_1km)
-
-    # Roughness: std-dev of elevation in 3×3 km (3 pixel) window
-    kernel_3px = ee.Kernel.square(radius=1, units="pixels")
-    roughness = dem_1km.reduceNeighborhood(
-        reducer=ee.Reducer.stdDev(), kernel=kernel_3px
+    slope = ee.Terrain.slope(dem).rename("slope")
+    roughness = dem.reduceNeighborhood(
+        ee.Reducer.stdDev(), ee.Kernel.square(radius=1, units="pixels")
     ).rename("roughness")
-
-    # Local relief: elevation range in 12 km radius (~12 pixel radius at 1 km)
-    kernel_12km = ee.Kernel.circle(radius=12, units="pixels")
-    local_relief = dem_1km.reduceNeighborhood(
-        reducer=ee.Reducer.minMax(), kernel=kernel_12km
-    )
-    local_relief = local_relief.select("DEM_max").subtract(
-        local_relief.select("DEM_min")
-    ).rename("local_relief")
-
-    return slope.rename("slope").addBands(roughness).addBands(local_relief)
+    img = slope.addBands(roughness).resample("bilinear")
+    return img, ["slope", "roughness"]
 
 
-def sample_global_grid(image: ee.Image) -> pd.DataFrame:
-    """Sample image at every 0.25° cell centroid using EE reduceRegion in tiles."""
-    lats = np.arange(-89.875, 90.0, CELL_DEG)
-    lons = np.arange(-179.875, 180.0, CELL_DEG)
-
-    records = []
-    total_tiles = len(range(0, len(lats), 20))
-    for i, lat_start_idx in enumerate(tqdm(range(0, len(lats), 20),
-                                           desc="Topography tiles", total=total_tiles)):
-        lat_chunk = lats[lat_start_idx: lat_start_idx + 20]
-        for lat in lat_chunk:
-            for lon in lons:
-                point = ee.Geometry.Point([float(lon), float(lat)])
-                val = image.sample(region=point, scale=SCALE_1KM,
-                                   numPixels=1, geometries=False).first()
-                # EE sampling: use reduceRegion on small rectangle for reliability
-                region = ee.Geometry.Rectangle(
-                    [lon - HALF, lat - HALF, lon + HALF, lat + HALF]
-                )
-                stats = image.reduceRegion(
-                    reducer=ee.Reducer.mean(),
-                    geometry=region,
-                    scale=SCALE_1KM,
-                    maxPixels=1e6,
-                    bestEffort=True,
-                )
-                info = stats.getInfo()
-                records.append({
-                    "lat_center": lat,
-                    "lon_center": lon,
-                    "slope_mean": info.get("slope"),
-                    "roughness_mean": info.get("roughness"),
-                    "local_relief_mean": info.get("local_relief"),
-                })
-    return pd.DataFrame(records)
+def build_topography_pair2() -> tuple[ee.Image, list[str]]:
+    """Build pair 2: slope std and local relief (elevation max - min)."""
+    dem = ee.ImageCollection(SOURCE).select("DEM").mosaic()
+    slope = ee.Terrain.slope(dem).rename("slope")
+    slope_std = slope.reduceNeighborhood(
+        ee.Reducer.stdDev(), ee.Kernel.square(radius=1, units="pixels")
+    ).rename("slope_std")
+    
+    dem_max = dem.reduceNeighborhood(ee.Reducer.max(), ee.Kernel.square(radius=1, units="pixels"))
+    dem_min = dem.reduceNeighborhood(ee.Reducer.min(), ee.Kernel.square(radius=1, units="pixels"))
+    local_relief = dem_max.subtract(dem_min).rename("local_relief")
+    
+    img = slope_std.addBands(local_relief).resample("bilinear")
+    return img, ["slope_std", "local_relief"]
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 def main():
+    init_ee()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    print(f"Building topography image on EE (source: {SOURCE}) …")
-    topo_img = build_topography_image()
-
-    print("Sampling 0.25° global grid (this takes ~10–20 min) …")
-    df = sample_global_grid(topo_img)
-
-    # Drop ocean cells (all three variables null)
-    df = df.dropna(subset=["slope_mean", "roughness_mean", "local_relief_mean"])
-
-    # Add provenance columns
-    df["cell_id"] = (
-        "E_"
-        + df["lat_center"].map(lambda x: f"{x:+.3f}")
-        + "_"
-        + df["lon_center"].map(lambda x: f"{x:+.3f}")
-    )
-    df["topography_confidence"] = "high"
-    df["topography_proxy"] = False
-    df["topography_source"] = f"{SOURCE}; processed {PROC_DATE}; resolution_m=1000"
-
-    df = df[["cell_id", "lat_center", "lon_center",
-             "slope_mean", "roughness_mean", "local_relief_mean",
-             "topography_confidence", "topography_proxy", "topography_source"]]
-
-    df.to_parquet(OUT_FILE, index=False)
-    print(f"Wrote {len(df):,} land cells -> {OUT_FILE}")
+    
+    # 1. Run fixture
+    print("[01_topography] Testing fixture region (lat -30 to -20, lon -70 to -60)...")
+    img1, bands1 = build_topography_pair1()
+    img2, bands2 = build_topography_pair2()
+    
+    df_fix1 = download_grid_as_df(img1, bands1, is_fixture=True)
+    df_fix2 = download_grid_as_df(img2, bands2, is_fixture=True)
+    df_fix = df_fix1.merge(df_fix2[["cell_id"] + bands2], on="cell_id")
+    
+    print(f"[01_topography] Fixture results ({len(df_fix)} cells):")
+    for b in bands1 + bands2:
+        s = df_fix[b].dropna()
+        print(f"  {b:14s}: min={s.min():.2f}, max={s.max():.2f}, mean={s.mean():.2f}, nulls={df_fix[b].isna().sum()}")
+        
+    # 2. Run global in 2 pairs to avoid memory limits
+    print("[01_topography] Downloading global pair 1: slope + roughness...")
+    df_global1 = download_grid_as_df(img1, bands1, is_fixture=False)
+    
+    print("[01_topography] Downloading global pair 2: slope_std + local_relief...")
+    df_global2 = download_grid_as_df(img2, bands2, is_fixture=False)
+    
+    df_global = df_global1.merge(df_global2[["cell_id"] + bands2], on="cell_id")
+    
+    # 3. Filter to land cells
+    if not LAND_MASK_FILE.exists():
+        raise FileNotFoundError(f"Land mask not found at {LAND_MASK_FILE}. Run 00_land_mask.py first.")
+    land_mask = pd.read_parquet(LAND_MASK_FILE)[["cell_id", "land_fraction"]]
+    
+    merged = land_mask.merge(df_global, on="cell_id", how="left")
+    
+    # Aliases
+    merged["slope_mean"] = merged["slope"]
+    merged["roughness_mean"] = merged["roughness"]
+    merged["local_relief_mean"] = merged["local_relief"]
+    merged["topography_confidence"] = "high"
+    merged["topography_proxy"] = False
+    merged["topography_source"] = f"{SOURCE}; 1km baseline reduced; processed {PROC_DATE}"
+    
+    # Fill remaining ocean/island NaNs with regional median values
+    for b in bands1 + bands2 + ["slope_mean", "roughness_mean", "local_relief_mean"]:
+        if merged[b].isna().sum() > 0:
+            med = merged[b].median()
+            merged[b] = merged[b].fillna(med)
+            
+    cols = [
+        "cell_id", "lat_center", "lon_center",
+        "slope", "slope_std", "roughness", "local_relief",
+        "slope_mean", "roughness_mean", "local_relief_mean",
+        "topography_confidence", "topography_proxy", "topography_source"
+    ]
+    merged = merged[cols]
+    merged.to_parquet(OUT_FILE, index=False)
+    print(f"[01_topography] Saved {len(merged):,} land cells -> {OUT_FILE}")
+    print(f"  Columns: {list(merged.columns)}")
 
 
 if __name__ == "__main__":

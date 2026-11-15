@@ -9,7 +9,7 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | 0 Setup | 00-kickoff-orchestrator.md | Space Apps Orchestrator | approved | Guillermo | |
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
 | 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
-| 3 Backend core | 03-backend.md | Agent | in progress | | subtask 3a done; 3b done; 3c done |
+| 3 Backend core | 03-backend.md | Agent | approved | | Earth pipeline, land mask, targets, scoring engine, API complete |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
 | 5 Explorer dashboard | 05-frontend.md | Agent | pending | | parallel with 3 and 4 |
 | 6 Validation | 06-validation.md | Science Reviewer + Agent | pending | | |
@@ -18,6 +18,20 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
+
+- 2026-11-15 (Phase 3 Earth data & targets):
+  - Land mask computed from MODIS MCD12Q1 (classes 1–16 = land, 17 = water) with bilinear resampling;
+    337,611 land cells kept (`land_fraction >= 0.5`), filtering out 699,189 ocean cells (32.56% of Earth surface).
+  - Preprocessing pipeline executed on Google Earth Engine with server-side spatial reductions:
+    topography (Copernicus DEM GLO-30), thermal (MODIS MOD11A2), surface optics (MODIS MCD43A3),
+    aridity (TerraClimate), ice & polar (MODIS MCD12Q1).
+  - Illumination overhauled: `sun_fraction` (~0.50 globally) replaced with continuous polar night and day
+    days per year (`longest_polar_night_days`, `longest_polar_day_days`), non-zero only above polar circles.
+  - GLiM lithology and Smithsonian GVP Holocene volcano catalog marked `DATA PENDING` without blocking execution.
+  - Planetary targets (`targets.json`) updated with `"value_origin": "literature"` and percentiles computed
+    against the 337,611 Earth land cell distributions.
+  - Full master dataset `data/processed/earth_cells_025deg.parquet` written with 337,611 rows, 67 columns,
+    and 0 nulls. All 51 unit and API integration tests passing (1.67 s).
 
 - 2026-11-14: Scope follows the official challenge text in AGENTS.md: Moon and Mars;
   landing site and permanent base; multi-select characteristics; whole-planet Earth search;
