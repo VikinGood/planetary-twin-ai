@@ -66,24 +66,39 @@ class AnalystGroqProvider(GroqProvider):
         self.model = os.environ.get("GROQ_MODEL") or "openai/gpt-oss-120b"
 
     async def interpret(self, result: dict) -> dict:
+        import asyncio
         import httpx
 
         payload = {
             "model": self.model,
             "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": build_prompt(result)}],
             "temperature": 0.2,
-            "max_tokens": 900,
+            "max_tokens": 2500,
             "response_format": {"type": "json_object"},
         }
-        try:
-            async with httpx.AsyncClient(timeout=45.0) as client:
-                r = await client.post(self.api_url, headers={"Authorization": f"Bearer {self.api_key}"}, json=payload)
-                r.raise_for_status()
-                parsed = json.loads(r.json()["choices"][0]["message"]["content"])
-        except Exception as exc:  # network, rate limit, bad JSON
-            fallback = await NoLLMProvider().interpret(result)
-            fallback["confidence_note"] = f"Groq API call failed: {exc}"
-            return fallback
+        for attempt in range(6):
+            try:
+                async with httpx.AsyncClient(timeout=45.0) as client:
+                    r = await client.post(self.api_url, headers={"Authorization": f"Bearer {self.api_key}"}, json=payload)
+                    if r.status_code == 429:
+                        reset_s = 15.0
+                        reset_header = r.headers.get("x-ratelimit-reset-tokens") or r.headers.get("retry-after")
+                        if reset_header:
+                            try:
+                                reset_s = float(str(reset_header).rstrip("s")) + 1.0
+                            except Exception:
+                                reset_s = 15.0
+                        await asyncio.sleep(max(5.0, reset_s))
+                        continue
+                    r.raise_for_status()
+                    parsed = json.loads(r.json()["choices"][0]["message"]["content"])
+                    break
+            except Exception as exc:  # network, rate limit, bad JSON
+                if attempt == 5:
+                    fallback = await NoLLMProvider().interpret(result)
+                    fallback["confidence_note"] = f"Groq API call failed: {exc}"
+                    return fallback
+                await asyncio.sleep(5.0)
         parsed.update({"model": self.model, "generated_at": datetime.now(timezone.utc).isoformat(), "ai_disclosure": AI_DISCLOSURE})
         return parsed
 
