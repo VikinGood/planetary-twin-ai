@@ -19,6 +19,12 @@ Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
 
+- 2026-11-15 (Project Title & Branding):
+  - Updated dashboard title to "Celestial Analog Finder - Planetary Twin AI" in `frontend/src/App.jsx` and `frontend/index.html`.
+  - Added docs/*.mp3 to `.gitignore` alongside docs/*.mp4 to protect audio/video assets from repo commits.
+  - Updated README.md and docs/SUBMISSION.md with tagline "Discover Earth. Prepare for other worlds."
+  - Deployed to GitHub Pages and verified live in browser.
+
 - 2026-11-15 (AI Analyst caching):
   - Pre-generated and cached AI interpretations for top 3 candidates per target using Groq (`openai/gpt-oss-120b`).
   - Strict schema and deterministic number checker enforced; 47 interpretations cached in `frontend/public/data/interpretations/`.
