@@ -10,7 +10,7 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
 | 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
 | 3 Backend core | 03-backend.md | Agent | approved | | Earth pipeline (1km slope, aridity, ice_polar, GLiM, GVP), targets, scoring engine, API complete |
-| 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
+| 4 AI analyst | 04-ai-analyst.md | Agent | approved | | Pre-generated AI interpretations cached for top 3 per target via Groq with deterministic checker |
 | 5 Explorer dashboard | 05-frontend.md | Agent | approved | | Static export <3MB, Vite build & Yarn tests passing, no MOCK banner, validation badge integrated |
 | 6 Validation | 06-validation.md | Science Reviewer + Agent | approved | Claude | Blind validation against 337k cells & 12 known analogs, stability +-20%, contrast tests passed |
 | 7 Submission package | 07-submission.md | Agent | pending | | |
@@ -18,6 +18,11 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 Status values: pending, in progress, review, approved, blocked.
 
 ## Decisions (append, newest last)
+
+- 2026-11-15 (AI Analyst caching):
+  - Pre-generated and cached AI interpretations for top 3 candidates per target using Groq (`openai/gpt-oss-120b`).
+  - Strict schema and deterministic number checker enforced; 47 interpretations cached in `frontend/public/data/interpretations/`.
+  - Pushed to `main` and deployed to GitHub Pages via Actions.
 
 - 2026-11-15 (GitHub Pages deployment & CI):
   - Updated `.github/workflows/pages.yml` to `node-version: 22` to satisfy dependencies.
