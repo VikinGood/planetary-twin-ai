@@ -9,7 +9,7 @@ Every task reads this file first and updates it last. Keep entries short. Englis
 | 0 Setup | 00-kickoff-orchestrator.md | Space Apps Orchestrator | approved | Guillermo | |
 | 1 Methodology | 01-methodology.md | Plan | approved | | |
 | 2 Data and architecture | 02-data-architecture.md | Plan | approved | | |
-| 3 Backend core | 03-backend.md | Agent | in progress | | subtask 3a done; 3b/3c pending |
+| 3 Backend core | 03-backend.md | Agent | in progress | | subtask 3a done; 3b done; 3c done |
 | 4 AI analyst | 04-ai-analyst.md | Agent | pending | | parallel with 3 and 5 |
 | 5 Explorer dashboard | 05-frontend.md | Agent | pending | | parallel with 3 and 4 |
 | 6 Validation | 06-validation.md | Science Reviewer + Agent | pending | | |
@@ -55,6 +55,17 @@ Status values: pending, in progress, review, approved, blocked.
   - PANGAEA (GLiM, IPA GZI): confirm free download without registration before preprocessing;
     if account required, free registration suffices (no commercial account needed).
   - MOLA-HRSC blended DEM: retained in DATASETS.md as reference-only; not needed for scoring.
+- 2026-11-15 (Phase 3c):
+  - Scoring engine (backend/scoring.py): 12 pure functions implementing METHODOLOGY.md §2 exactly.
+  - FastAPI backend (backend/main.py + 6 routers): /characteristics, /missions, /candidates,
+    /candidates/{cell_id}, /compare, /validation, /interpret.
+  - LLM integration (backend/llm_provider.py): LLMProvider, NoLLMProvider, GroqProvider.
+  - data_loader.py: load_earth_cells() + load_targets() + load_characteristics() + load_missions().
+  - Unit tests: 51 tests, 0 failures (pytest backend/tests/ in 1.81 s).
+  - scripts/export_static.py: produces frontend/public/data/{body}_{mission_type}.json GeoJSON.
+  - backend/README.md: exact server start command documented (uvicorn backend.main:app --reload).
+  - known_analog_within_km placeholder still -1.0 (Phase 3c populates real values when analog
+    catalog CSVs are downloaded; scoring._is_known_analog() treats -1.0 as not-known).
 - 2026-11-14 (Phase 3a):
   - GLiM integer-to-class mapping: assumes standard Hartmann & Moosdorf 2012 encoding
     (1=vb, 2=va, … 15=ice). Adjust GLIM_INT_TO_CLASS dict in 05_geology.py if the PANGAEA
@@ -78,8 +89,23 @@ Status values: pending, in progress, review, approved, blocked.
 - `scripts/earth/01_topography.py` through `scripts/earth/08_illumination.py`: ✅ Phase 3a.
 - `scripts/earth/00_assemble.py`: ✅ Phase 3a.
 - `scripts/README.md`: ✅ Phase 3a.
+- `backend/__init__.py`, `backend/scoring.py`: ✅ Phase 3c.
+- `backend/data_loader.py`: ✅ Phase 3c.
+- `backend/llm_provider.py`: ✅ Phase 3c.
+- `backend/main.py`: ✅ Phase 3c.
+- `backend/routers/` (6 routers): ✅ Phase 3c.
+- `backend/tests/test_scoring.py` (36 unit tests): ✅ Phase 3c.
+- `backend/tests/test_api.py` (15 API tests): ✅ Phase 3c.
+- `scripts/export_static.py`: ✅ Phase 3c.
+- `backend/README.md`: ✅ Phase 3c.
 - `data/processed/earth_illumination_025deg.parquet`: ✅ produced (pure computation, 1,036,800 cells).
 - `data/processed/earth_cells_025deg.parquet`: ✅ partial (illumination only; 7 chars pending raw data).
+- `scripts/planets/01_moon_references.py`: ✅ Phase 3b — 11 Moon targets (9 landing + 2 base); literature values, all UNVERIFIED.
+- `scripts/planets/02_mars_references.py`: ✅ Phase 3b — 5 Mars targets (3 landing + 2 base); literature values, all UNVERIFIED.
+- `scripts/planets/00_assemble_targets.py`: ✅ Phase 3b — merges both; computes illumination percentiles from Earth parquet (real); thermal percentiles APPROXIMATE (Earth parquet lacks thermal columns yet).
+- `data/processed/moon_targets_raw.json`: ✅ produced.
+- `data/processed/mars_targets_raw.json`: ✅ produced.
+- `data/processed/targets.json`: ✅ produced — 16 targets; illumination percentiles computed from 1,036,800 Earth cells; thermal percentiles labeled APPROXIMATE until Earth thermal pipeline runs.
 
 ## Open questions for the team
 

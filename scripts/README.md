@@ -180,3 +180,61 @@ the missing raw files.
 | `GVP catalog CSV not found` | Raw file not downloaded | Download from volcano.si.edu |
 | `IPA GZI GeoTIFF not found` | Raw file not downloaded | Download from PANGAEA (see §3 above) |
 | `No per-characteristic parquet files found` | 00_assemble.py run before any data exists | Run steps 01–08 first |
+
+---
+
+## Planet reference targets (`scripts/planets/`)
+
+These scripts build `data/processed/targets.json` — the reference value table for all 16
+planetary targets (9 moon-landing, 2 moon-base, 3 mars-landing, 2 mars-base).
+They use **hardcoded literature values only** — no live API calls, no EE, no raw data
+downloads required.
+
+### No prerequisites beyond the venv
+
+All three scripts run with the base `.venv` (only `numpy` required; already installed).
+
+### Step P1 — Moon reference values (literature)
+
+```bash
+python scripts/planets/01_moon_references.py
+```
+
+Output: `data/processed/moon_targets_raw.json`
+Approximate runtime: **< 1 s**
+
+### Step P2 — Mars reference values (literature)
+
+```bash
+python scripts/planets/02_mars_references.py
+```
+
+Output: `data/processed/mars_targets_raw.json`
+Approximate runtime: **< 1 s**
+
+### Step P0 — Assemble targets.json
+
+**Requires:** P1 and P2 outputs.
+
+```bash
+python scripts/planets/00_assemble_targets.py
+```
+
+Output: `data/processed/targets.json`
+Approximate runtime: **< 10 s**
+
+If `data/processed/earth_cells_025deg.parquet` exists and contains illumination columns,
+illumination percentile estimates are computed from the real Earth distribution.
+If thermal columns are not yet present, those percentile estimates fall back to hardcoded
+APPROXIMATE values labeled in the output. Re-run after completing the Earth pipeline.
+
+### Expected output summary
+
+| File | Targets | Notes |
+|------|---------|-------|
+| `moon_targets_raw.json` | 11 (9 landing + 2 base) | All values UNVERIFIED; from literature |
+| `mars_targets_raw.json` | 5 (3 landing + 2 base) | All values UNVERIFIED; from literature |
+| `targets.json` | 16 total | Merged; percentile estimates injected |
+
+All values are marked `UNVERIFIED` and must be validated against primary PDS/LROC/MCD
+data before Phase 6.
